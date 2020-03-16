@@ -61,7 +61,7 @@ namespace RaylibSharp
         public Nodes node1, node2;
         int tx, ty;
         Vector2 firstPos, secondPos;
-        Color connectionColor = new Color(142, 100, 82);
+        Color connectionColor = new Color(200, 200, 200);
         Color textColor = new Color(0, 0, 0);
 
 

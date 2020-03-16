@@ -114,6 +114,18 @@ namespace RaylibSharp
                     thisNode.Show();
                 }
 
+
+                if (!inputDistance)
+                {
+                    DrawText("Click on white to add node", 10, 10, 20, Color.BLACK);
+
+                    if (ballNum > 1)
+                        DrawText("Click on two nodes to make a connection", 10, 30, 20, Color.BLACK);
+                }
+                else
+                    DrawText("Type the weight, and then ENTER-key", 10, 10, 20, Color.BLACK);
+
+
                 EndDrawing();
             }
 

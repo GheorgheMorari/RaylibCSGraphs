@@ -2,30 +2,28 @@
 using System.Runtime.InteropServices;
 using RaylibSharp.Raylib.Types;
 
-namespace RaylibSharp
+namespace RaylibSharp //kek
 {
-
     namespace Raylib
     {
-
         public enum ConfigFlag : byte
         {
-            FlagShowLogo          =  1,
-            FlagFullscreenMode    =  2,
-            FlagWindowResizable   =  4,
-            FlagWindowUndecorated =  8,
+            FlagShowLogo = 1,
+            FlagFullscreenMode = 2,
+            FlagWindowResizable = 4,
+            FlagWindowUndecorated = 8,
             FlagWindowTransparent = 16,
-            FlagMsaa_4XHint       = 32,
-            FlagVsyncHint         = 64
+            FlagMsaa_4XHint = 32,
+            FlagVsyncHint = 64
         }
 
         public enum TraceLogFlag : byte
         {
-            LogInfo    =  1,
-            LogWarning =  2,
-            LogError   =  4,
-            LogDebug   =  8,
-            LogOther   = 16
+            LogInfo = 1,
+            LogWarning = 2,
+            LogError = 4,
+            LogDebug = 8,
+            LogOther = 16
         }
 
         public enum CameraMode
@@ -39,17 +37,17 @@ namespace RaylibSharp
 
         public enum GestureType : uint
         {
-            GestureNone       =   0,
-            GestureTap        =   1,
-            GestureDoubletap  =   2,
-            GestureHold       =   4,
-            GestureDrag       =   8,
-            GestureSwipeRight =  16,
-            GestureSwipeLeft  =  32,
-            GestureSwipeUp    =  64,
-            GestureSwipeDown  = 128,
-            GesturePinchIn    = 256,
-            GesturePinchOut   = 512
+            GestureNone = 0,
+            GestureTap = 1,
+            GestureDoubletap = 2,
+            GestureHold = 4,
+            GestureDrag = 8,
+            GestureSwipeRight = 16,
+            GestureSwipeLeft = 32,
+            GestureSwipeUp = 64,
+            GestureSwipeDown = 128,
+            GesturePinchIn = 256,
+            GesturePinchOut = 512
         }
 
         public enum CameraType
@@ -91,99 +89,101 @@ namespace RaylibSharp
             HmdValveHtcVive,
             HmdSonyPsVr
         }
-        
+
         public enum KeyboardKey
         {
             // keyboard keys
-            KeySpace            =  32,
-            KeyEscape           = 256,
-            KeyEnter            = 257,
-            KeyTab              = 258,
-            KeyBackspace        = 259,
-            KeyInsert           = 260,
-            KeyDelete           = 261,
-            KeyRight            = 262,
-            KeyLeft             = 263,
-            KeyDown             = 264,
-            KeyUp               = 265,
-            KeyPageUp           = 266,
-            KeyPageDown         = 267,
-            KeyHome             = 268,
-            KeyEnd              = 269,
-            KeyCapsLock         = 280,
-            KeyScrollLock       = 281,
-            KeyNumLock          = 282,
-            KeyPrintScreen      = 283,
-            KeyPause            = 284,
-            KeyF1               = 290,
-            KeyF2               = 291,
-            KeyF3               = 292,
-            KeyF4               = 293,
-            KeyF5               = 294,
-            KeyF6               = 295,
-            KeyF7               = 296,
-            KeyF8               = 297,
-            KeyF9               = 298,
-            KeyF10              = 299,
-            KeyF11              = 300,
-            KeyF12              = 301,
-            KeyLeftShift        = 340,
-            KeyLeftControl      = 341,
-            KeyLeftAlt          = 342,
-            KeyRightShift       = 344,
-            KeyRightControl     = 345,
-            KeyRightAlt         = 346,
-            KeyGrave            =  96,
-            KeySlash            =  47,
-            KeyBackslash        =  92,
-            KeyZero             =  48,
-            KeyOne              =  49,
-            KeyTwo              =  50,
-            KeyThree            =  51,
-            KeyFour             =  52,
-            KeyFive             =  53,
-            KeySix              =  54,
-            KeySeven            =  55,
-            KeyEight            =  56,
-            KeyNine             =  57,
-            KeyA                =  65,
-            KeyB                =  66,
-            KeyC                =  67,
-            KeyD                =  68,
-            KeyE                =  69,
-            KeyF                =  70,
-            KeyG                =  71,
-            KeyH                =  72,
-            KeyI                =  73,
-            KeyJ                =  74,
-            KeyK                =  75,
-            KeyL                =  76,
-            KeyM                =  77,
-            KeyN                =  78,
-            KeyO                =  79,
-            KeyP                =  80,
-            KeyQ                =  81,
-            KeyR                =  82,
-            KeyS                =  83,
-            KeyT                =  84,
-            KeyU                =  85,
-            KeyV                =  86,
-            KeyW                =  87,
-            KeyX                =  88,
-            KeyY                =  89,
-            KeyZ                =  90,
-            
+            KeySpace = 32,
+
+            KeyEscape = 256,
+            KeyEnter = 257,
+            KeyTab = 258,
+            KeyBackspace = 259,
+            KeyInsert = 260,
+            KeyDelete = 261,
+            KeyRight = 262,
+            KeyLeft = 263,
+            KeyDown = 264,
+            KeyUp = 265,
+            KeyPageUp = 266,
+            KeyPageDown = 267,
+            KeyHome = 268,
+            KeyEnd = 269,
+            KeyCapsLock = 280,
+            KeyScrollLock = 281,
+            KeyNumLock = 282,
+            KeyPrintScreen = 283,
+            KeyPause = 284,
+            KeyF1 = 290,
+            KeyF2 = 291,
+            KeyF3 = 292,
+            KeyF4 = 293,
+            KeyF5 = 294,
+            KeyF6 = 295,
+            KeyF7 = 296,
+            KeyF8 = 297,
+            KeyF9 = 298,
+            KeyF10 = 299,
+            KeyF11 = 300,
+            KeyF12 = 301,
+            KeyLeftShift = 340,
+            KeyLeftControl = 341,
+            KeyLeftAlt = 342,
+            KeyRightShift = 344,
+            KeyRightControl = 345,
+            KeyRightAlt = 346,
+            KeyGrave = 96,
+            KeySlash = 47,
+            KeyBackslash = 92,
+            KeyZero = 48,
+            KeyOne = 49,
+            KeyTwo = 50,
+            KeyThree = 51,
+            KeyFour = 52,
+            KeyFive = 53,
+            KeySix = 54,
+            KeySeven = 55,
+            KeyEight = 56,
+            KeyNine = 57,
+            KeyA = 65,
+            KeyB = 66,
+            KeyC = 67,
+            KeyD = 68,
+            KeyE = 69,
+            KeyF = 70,
+            KeyG = 71,
+            KeyH = 72,
+            KeyI = 73,
+            KeyJ = 74,
+            KeyK = 75,
+            KeyL = 76,
+            KeyM = 77,
+            KeyN = 78,
+            KeyO = 79,
+            KeyP = 80,
+            KeyQ = 81,
+            KeyR = 82,
+            KeyS = 83,
+            KeyT = 84,
+            KeyU = 85,
+            KeyV = 86,
+            KeyW = 87,
+            KeyX = 88,
+            KeyY = 89,
+            KeyZ = 90,
+
             // android keys
-            KeyBack             =   4,
-            KeyMenu             =  82,
-            KeyVolumeUp         =  24,
-            KeyVolumeDown       =  25
+            KeyBack = 4,
+
+            KeyMenu = 82,
+            KeyVolumeUp = 24,
+            KeyVolumeDown = 25
         }
 
         public enum MouseButton
         {
-            MouseLeftButton   = 0,
-            MouseRightButton  = 1,
+            MouseLeftButton = 0,
+            MouseRightButton = 1,
             MouseMiddleButton = 2
         }
 
@@ -708,7 +708,7 @@ namespace RaylibSharp
 
             [DllImport(@"raylib.dll")]
             public static extern void EndVrDrawing();
-            
+
             // 3d primitives
             [DllImport(@"raylib.dll")]
             public static extern void DrawLine3D(Vector3 startPos, Vector3 endPos, Color color);

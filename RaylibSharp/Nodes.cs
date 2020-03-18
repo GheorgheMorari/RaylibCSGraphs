@@ -8,16 +8,15 @@ namespace RaylibSharp
     {
         public Vector2 pos;      //the vector of the positions use pos.x and pos.y
         public int index;        //the index of the node
+        public int dist;     //the distance from the node 0
         public float radius = 20;//the radius of the node
         public float border = 2; //border radius + radius
-
+        bool IsRoot = false;
         Color baseColor;
         Color borderColor;
+        Color highlight;
 
-        public float dist = -1; //distance from the starting point
 
-        List<Connections> connections = new List<Connections>(); //the list of connections of this node
-        public Connections retur; //the connection that returns to the node with the least distance to the starting point
         public Nodes() // basic initialisation to exclude uninitialised objects used
         {
         }
@@ -25,70 +24,52 @@ namespace RaylibSharp
         {
             pos = pos_;
             baseColor = new Color(255, 0, 0);
+            highlight = new Color(255, 215, 0);
             borderColor = new Color(130, 45, 45);
             index = index_;
+            if (index == 0) IsRoot = true;
         }
 
-        public void Show()
+        public void Show(bool showDistance = false)
         {
-            foreach (Connections thisConnection in connections)
-            {
-                thisConnection.ShowConnection(); //draw all connections first
-            }
 
             DrawCircleV(pos, radius + border, borderColor); //draw border
             DrawCircleV(pos, radius, baseColor); //draw circle
 
+            if(!showDistance)
+                DrawText(index.ToString(), (int)(pos.x - radius / 3.5), (int)(pos.y - radius / 2.7), 20, Color.BLACK);
+            else
+                if (dist == int.MaxValue)
+                    DrawText("INF", (int)(pos.x - radius / 3.5), (int)(pos.y - radius / 2.7), 20, Color.BLACK);
+                else
+                    DrawText(dist.ToString(), (int)(pos.x - radius / 3.5), (int)(pos.y - radius / 2.7), 20, Color.BLACK);
+        }
+
+        public void Highlight()
+        {
+
+            DrawCircleV(pos, radius + border, borderColor); //draw border
+            DrawCircleV(pos, radius, highlight); //draw circle
 
             DrawText(index.ToString(), (int)(pos.x - radius / 3.5), (int)(pos.y - radius / 2.7), 20, Color.BLACK);
         }
 
-        public void AddConnection(Nodes node1, Nodes node2, int weight)
-        {
-            connections.Add(new Connections(node1, node2, weight)); //add new connection to the list
-        }
-
-        public Connections GetLastConnection()
-        {
-            return connections[connections.Count - 1]; //return the last connection
-        }
-
     }
-    public class Connections
+    public static class Connections
     {
-        public bool traversed = false;
-        public int weight = -1;
-        public Nodes node1, node2;
-        int tx, ty;
-        Vector2 firstPos, secondPos;
-        Color connectionColor = new Color(200, 200, 200);
-        Color textColor = new Color(0, 0, 0);
+        static Color connectionColor = new Color(200, 200, 200);
+        static Color textColor = new Color(0, 0, 0);
 
-
-        public Connections(Nodes node1_, Nodes node2_, int weight_)
+        public static void ShowConnection(Nodes node1, Nodes node2, int weight)
         {
-            weight = weight_;
-            node1 = node1_;
-            node2 = node2_;
-            firstPos = node1_.pos;
-            secondPos = node2_.pos;
-            tx = (int)(node1.pos.x + node2.pos.x) / 2;
-            ty = (int)(node1.pos.y + node2.pos.y) / 2;
-
-
-        }
-
-        public void ShowConnection()
-        {
-            DrawLineEx(firstPos, secondPos, 3, connectionColor);
+            DrawLineEx(node1.pos, node2.pos, 3, connectionColor);
+            float x1 = node1.pos.x;
+            float x2 = node2.pos.x;
+            float y1 = node1.pos.y;
+            float y2 = node2.pos.y;
 
             if (weight != -1)
-                DrawText(weight.ToString(), tx - 10, ty - 10, 20, textColor);
-        }
-
-        public void SetWeight(int weight_)
-        {
-            weight = weight_;
+                DrawText(weight.ToString(), (int)(x1 + x2) / 2 - 10, (int)(y1 + y2) / 2 - 10, 20, textColor);
         }
 
     }

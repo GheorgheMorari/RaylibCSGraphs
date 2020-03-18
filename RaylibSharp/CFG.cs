@@ -1,15 +1,14 @@
 ﻿using System;
 
-class GFG
+static class GFG
 {
     // A utility function to find the 
     // vertex with minimum distance 
     // value, from the set of vertices 
     // not yet included in shortest 
     // path tree 
-    static int V = 9;
-    int minDistance(int[] dist,
-                    bool[] sptSet)
+    static int minDistance(int[] dist,
+                    bool[] sptSet, int V)
     {
         // Initialize min value 
         int min = int.MaxValue, min_index = -1;
@@ -26,7 +25,7 @@ class GFG
 
     // A utility function to print 
     // the constructed distance array 
-    void printSolution(int[] dist, int n)
+    static void printSolution(int[] dist, int V)
     {
         Console.Write("Vertex     Distance "
                       + "from Source\n");
@@ -38,9 +37,9 @@ class GFG
     // single source shortest path algorithm 
     // for a graph represented using adjacency 
     // matrix representation 
-    void dijkstra(int[,] graph, int src)
+    public static int[] dijkstra(int[,] graph, int src, int size)
     {
-        int[] dist = new int[V]; // The output array. dist[i] 
+        int[] dist = new int[size]; // The output array. dist[i] 
                                  // will hold the shortest 
                                  // distance from src to i 
 
@@ -48,11 +47,11 @@ class GFG
         // i is included in shortest path 
         // tree or shortest distance from 
         // src to i is finalized 
-        bool[] sptSet = new bool[V];
+        bool[] sptSet = new bool[size];
 
         // Initialize all distances as 
         // INFINITE and stpSet[] as false 
-        for (int i = 0; i < V; i++)
+        for (int i = 0; i < size; i++)
         {
             dist[i] = int.MaxValue;
             sptSet[i] = false;
@@ -63,20 +62,20 @@ class GFG
         dist[src] = 0;
 
         // Find shortest path for all vertices 
-        for (int count = 0; count < V - 1; count++)
+        for (int count = 0; count < size - 1; count++)
         {
             // Pick the minimum distance vertex 
             // from the set of vertices not yet 
             // processed. u is always equal to 
             // src in first iteration. 
-            int u = minDistance(dist, sptSet);
+            int u = minDistance(dist, sptSet, size);
 
             // Mark the picked vertex as processed 
             sptSet[u] = true;
 
             // Update dist value of the adjacent 
             // vertices of the picked vertex. 
-            for (int v = 0; v < V; v++)
+            for (int v = 0; v < size; v++)
 
                 // Update dist[v] only if is not in 
                 // sptSet, there is an edge from u 
@@ -89,24 +88,8 @@ class GFG
         }
 
         // print the constructed distance array 
-        printSolution(dist, V);
+        printSolution(dist, size);
+        return dist;
     }
 
-    // Driver Code 
-    public static void Main()
-    {
-        /* Let us create the example  
-graph discussed above */
-        int[,] graph = new int[,] { { 0, 4, 0, 0, 0, 0, 0, 8, 0 },
-                                      { 4, 0, 8, 0, 0, 0, 0, 11, 0 },
-                                      { 0, 8, 0, 7, 0, 4, 0, 0, 2 },
-                                      { 0, 0, 7, 0, 9, 14, 0, 0, 0 },
-                                      { 0, 0, 0, 9, 0, 10, 0, 0, 0 },
-                                      { 0, 0, 4, 14, 10, 0, 2, 0, 0 },
-                                      { 0, 0, 0, 0, 0, 2, 0, 1, 6 },
-                                      { 8, 11, 0, 0, 0, 0, 1, 0, 7 },
-                                      { 0, 0, 2, 0, 0, 0, 6, 7, 0 } };
-        GFG t = new GFG();
-        t.dijkstra(graph, 0);
-    }
 }

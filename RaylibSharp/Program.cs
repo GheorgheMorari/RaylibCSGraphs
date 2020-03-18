@@ -1,5 +1,4 @@
-﻿
-using RaylibSharp.Raylib.Types;
+﻿using RaylibSharp.Raylib.Types;
 using System;
 using System.Collections.Generic;
 using static RaylibSharp.Raylib.Raylib;
@@ -8,13 +7,25 @@ namespace RaylibSharp
 {
     internal class Program
     {
-        public static void ShowConnections(int[,] matrix, List<Nodes> node)
+        public static int[,] ResizeArray(int[,] original, int size)
         {
-            for (int i = 0; i < Math.Sqrt(matrix.Length); i++)
-                for (int j = i; j < Math.Sqrt(matrix.Length); j++)
+            var newArray = new int[size, size];
+            int oSize = Math.Min(original.GetLength(0), size);
+            for (int i = 0; i < oSize; i++)
+                for (int j = 0; j < oSize; j++)
+                    newArray[i, j] = original[i, j];
+            return newArray;
+        }
+
+        public static void ShowConnections(int[,] matrix, List<Nodes> node) //show all connections
+        {
+            int len = matrix.GetLength(0);
+            for (int i = 0; i < len; i++)
+                for (int j = i; j < len; j++)
                     if (matrix[i, j] > 0)
                         Connections.ShowConnection(node[i], node[j], matrix[i, j]);
         }
+
         public static void PrintMatrix(int[,] matrix)
         {
             Console.Write('\n');
@@ -25,28 +36,35 @@ namespace RaylibSharp
                 Console.Write('\n');
             }
         }
+
         public static void DeleteConnections(int[,] matrix, int index)
         {
-            PrintMatrix(matrix);
-            for (int i = 0; i < Math.Sqrt(matrix.Length); i++)
-                if (matrix[index, i] > 0)
-                {
-                    matrix[index, i] = 0;
-                    matrix[i, index] = 0;
-                }
+            int limit = matrix.GetLength(0);
+            for (int i = index; i < limit - 1; i++) //shift the colls left
+                for (int j = 0; j < limit; j++)
+                    matrix[i, j] = matrix[i + 1, j];
 
-            PrintMatrix(matrix);
+            for (int j = 0; j < limit; j++) //delete the remaining weights after shifting
+                matrix[limit - 1, j] = 0;
 
+            for (int i = index; i < limit - 1; i++) //shift the rows up
+                for (int j = 0; j < limit; j++)
+                    matrix[j, i] = matrix[j, i + 1];
+
+            for (int j = 0; j < limit; j++)//delete the remaining weights after shifting
+                matrix[j, limit - 1] = 0;
         }
-        public static void AddConnection(int[,] matrix, Nodes node1, Nodes node2, int weight)
+
+        public static void AddConnection(int[,] matrix, Nodes node1, Nodes node2, int weight) //add connection to the matrix
         {
             if (node1 == node2) return;
             matrix[node1.index, node2.index] = weight;
             matrix[node2.index, node1.index] = weight;
         }
 
-        public static void GetSolution(List<Nodes> node, int[] dist)
+        public static void GetSolution(List<Nodes> node, int[,] matrix, int rootNode) //get the distance from the rootNode
         {
+            int[] dist = GFG.dijkstra(matrix, rootNode, matrix.GetLength(0));
             int V = dist.Length;
 
             for (int i = 0; i < V; i++)
@@ -57,23 +75,29 @@ namespace RaylibSharp
         {
             InitWindow(1280, 720, "Dijkstra algorithm");
             SetTargetFPS(24);
-            int ballNum = 0;
-            List<Nodes> node = new List<Nodes>();
 
-            Nodes tempNode0 = new Nodes(); //temporary nodes to save what node is selected
+            //The main list of nodes
+            List<Nodes> node = new List<Nodes>();
+            int rootNode = 0;
+
+            //temporary nodes
+            Nodes tempNode0 = new Nodes();
             Nodes tempNode1 = new Nodes();
             Nodes tempNode2 = new Nodes();
+
+            //Boolean flags
             bool colision = false;
             bool firstChoosen = false;
             bool inputDistance = false;
             bool showDistance = false;
+
+            //Distance input stuff
             int letterCount = 0;
             char[] val = new char[9];
             val[0] = '0';
-            int[,] matrix = new int[40, 40];
-            for (int i = 0; i < 40; i++)
-                for (int j = 0; j < 40; j++)
-                    matrix[i, j] = 0;
+
+            //Adjacency matrix
+            int[,] matrix = new int[2, 2];
 
             while (!WindowShouldClose())
             {
@@ -82,49 +106,47 @@ namespace RaylibSharp
 
                 if (IsMouseButtonPressed(0) && !inputDistance) //Click to add new node
                 {
-                    if (ballNum > 1) //check if there are less than 2 balls so no connections can be made
-                    {
-                        foreach (Nodes thisNode in node)
-                            if (CheckCollisionPointCircle(GetMousePosition(), thisNode.pos, thisNode.radius))
-                            { //check if mouse is over all points, if yes then colision is set to true
-                                colision = true;
-                                tempNode0 = thisNode;
-                                break;
-                            }
+                    foreach (Nodes thisNode in node)
+                        if (CheckCollisionPointCircle(GetMousePosition(), thisNode.pos, thisNode.radius))
+                        { //check if mouse is over all points, if yes then colision is set to true
+                            colision = true;
+                            tempNode0 = thisNode;
+                            break;
+                        }
 
-                        if (colision) // if there is a colision
+                    if (colision) // if there is a colision
+                    {
+                        if (!firstChoosen) //choose the first node
                         {
-                            if (!firstChoosen) //choose the first node
-                            {
-                                firstChoosen = true;
-                                tempNode1 = tempNode0; // set the tempNode1 to be the node that was collided
-                            }
-                            else //choose the second node
-                            {
-                                firstChoosen = false;
-                                tempNode2 = tempNode0; //set the second node
-                                if (tempNode2 != tempNode1) //No distance to itself
-                                {
-                                    AddConnection(matrix, tempNode1, tempNode2, 0); // make a connection
-                                    inputDistance = true; //initiate the inputting of distance
-                                }
-                            }
-                            colision = false;
+                            firstChoosen = true;
+                            tempNode1 = tempNode0; // set the tempNode1 to be the node that was collided
                         }
-                        else
+                        else //choose the second node
                         {
-                            node.Add(new Nodes(GetMousePosition(), node.Count)); //if there is no colission add new node to the list
+                            firstChoosen = false;
+                            tempNode2 = tempNode0; //set the second node
+                            if (tempNode2 != tempNode1) //No distance to itself
+                            {
+                                inputDistance = true; //initiate the inputting of distance
+                            }
+                            else //Choose the new root node
+                            {
+                                rootNode = tempNode0.index;
+                                tempNode2 = null;
+                                tempNode0 = null;
+                                GetSolution(node, matrix, rootNode);
+                            }
                         }
+                        colision = false;
                     }
                     else
                     {
-                        ballNum++;
-                        node.Add(new Nodes(GetMousePosition(), node.Count)); //if there are fewer than 2 nodes, then add new nodes
+                        node.Add(new Nodes(GetMousePosition(), node.Count)); //if there is no colision add new node to the list
+                        matrix = ResizeArray(matrix, node.Count);
                     }
-
                 }
 
-                if (inputDistance) // if two nodes are selected, then input the weight 
+                if (inputDistance) // if two nodes are selected, then input the weight
                 {
                     int key = GetKeyPressed();
 
@@ -158,7 +180,7 @@ namespace RaylibSharp
                         inputDistance = false;
 
                         if (showDistance)
-                            GetSolution(node, GFG.dijkstra(matrix, 0, node.Count));
+                            GetSolution(node, matrix, rootNode);
                     }
                     int x = (int)(tempNode1.pos.x + tempNode2.pos.x) / 2;
                     int y = (int)(tempNode1.pos.y + tempNode2.pos.y) / 2;
@@ -175,9 +197,8 @@ namespace RaylibSharp
                     {
                         DrawText("Press Delete to Delete this Node", 10, 30, 20, Color.BLACK);
                         DrawText("Or click on another Node to Make a connection", 10, 50, 20, Color.BLACK);
-
+                        DrawText("Click again on it to make it the ROOT", 10, 70, 20, Color.BLACK);
                     }
-
                 }
 
                 //Show all the connections
@@ -186,9 +207,9 @@ namespace RaylibSharp
                 //Show all the nodes
                 foreach (Nodes thisNode in node)
                 {
-                    thisNode.Show(showDistance);
+                    thisNode.Show(showDistance, rootNode);
                 }
-                //Hightlight selected node
+                //Highlight selected node
                 if (tempNode0 == tempNode1)
                 {
                     tempNode0.Highlight();
@@ -200,31 +221,34 @@ namespace RaylibSharp
                     tempNode2.Highlight();
                 }
                 //Delete node
-                if (IsKeyPressed(Raylib.KeyboardKey.KeyDelete))
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyDelete) && tempNode0 == tempNode1)
                 {
                     int removeIndex = tempNode0.index;
+
+                    if (removeIndex == rootNode) //change root if root is deleted
+                        rootNode = 0;
+
                     node.RemoveAt(removeIndex);
-                    firstChoosen = false;
-                    for (int i = 0; i < node.Count; i++)
-                        node[i].index = i;
+                    firstChoosen = false; //deselect node
                     DeleteConnections(matrix, removeIndex);
+                    matrix = ResizeArray(matrix, node.Count);
+                    for (int i = 0; i < node.Count; i++) //redo all indexes
+                        node[i].index = i;
+                    if (node.Count > 1)
+                        GetSolution(node, matrix, rootNode);
                     tempNode0 = null;
                 }
                 //Show distance from node 0
                 if (IsKeyPressed(Raylib.KeyboardKey.KeyF))
                 {
                     showDistance = !showDistance;
-                    GetSolution(node, GFG.dijkstra(matrix, 0, node.Count));
-
+                    GetSolution(node, matrix, rootNode);
                 }
 
                 EndDrawing();
             }
 
             CloseWindow();
-
         }
-
     }
-
 }

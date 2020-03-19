@@ -54,21 +54,4 @@ namespace RaylibSharp
             DrawText(index.ToString(), (int)(pos.x - radius / 3.5), (int)(pos.y - radius / 2.7), 20, Color.BLACK);
         }
     }
-
-    public static class Connections
-    {
-        private static Color connectionColor = new Color(200, 200, 200);
-        private static Color textColor = new Color(0, 0, 0);
-
-        public static void ShowConnection(Nodes node1, Nodes node2, int weight)
-        {
-            DrawLineEx(node1.pos, node2.pos, 3, connectionColor);
-            float x1 = node1.pos.x;
-            float x2 = node2.pos.x;
-            float y1 = node1.pos.y;
-            float y2 = node2.pos.y;
-
-            DrawText(weight.ToString(), (int)(x1 + x2) / 2 - 10, (int)(y1 + y2) / 2 - 10, 20, textColor);
-        }
-    }
 }

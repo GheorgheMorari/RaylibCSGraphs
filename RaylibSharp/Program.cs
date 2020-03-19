@@ -215,7 +215,7 @@ namespace RaylibSharp
                     DrawText("F - Dijkstra Distance, C - Connections, R - Random, V - Prim's Minimal Spanning Tree", 10, 10, 20, Color.BLACK);
                     DrawText("Press W to export graph via text file", 10, 690, 20, Color.BLACK);
                     DrawText("Press I to import graph via text file (1-line number of vertices,2-nd line starts matrix represenation)", 10, 670, 20, Color.BLACK);
-                    DrawText("Click to add node, Press F to toggle Distance", 10, 10, 20, Color.BLACK);
+
                     if (!firstChoosen)
                         DrawText("Click on a node to select it", 10, 30, 20, Color.BLACK);
                     else
@@ -316,13 +316,13 @@ namespace RaylibSharp
                 }
                 //Import the matrix by pressing I
                 if (IsKeyPressed(Raylib.KeyboardKey.KeyI))
-                {                  
-                    matrix =ReadingTxt.ReadingWriting.ImportMatrix(node);                 
+                {
+                    matrix = ReadingTxt.ReadingWriting.ImportMatrix(node);
                 }
                 //Export the matrix by pressing W
                 if (IsKeyPressed(Raylib.KeyboardKey.KeyW))
                 {
-                    //Export matrix 
+                    //Export matrix
                     ReadingTxt.ReadingWriting.ExportMatrix(matrix);
                 }
 

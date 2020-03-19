@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using static RaylibSharp.Raylib.Raylib;
-//ok
+
+//fix bug where when the root is the last node and you delete any node except the last, there is a out of bounds exception
 namespace RaylibSharp
 {
     internal class Program
@@ -73,7 +74,7 @@ namespace RaylibSharp
 
         public static void Main()
         {
-            InitWindow(1280, 720, "Dijkstra algorithm");
+            InitWindow(1800, 980, "Dijkstra algorithm");
             SetTargetFPS(24);
 
             //The main list of nodes
@@ -228,20 +229,43 @@ namespace RaylibSharp
                     if (removeIndex == rootNode) //change root if root is deleted
                         rootNode = 0;
 
-                    node.RemoveAt(removeIndex);
+                    node.RemoveAt(removeIndex); //remove from list
+
                     firstChoosen = false; //deselect node
-                    DeleteConnections(matrix, removeIndex);
-                    matrix = ResizeArray(matrix, node.Count);
+
+                    DeleteConnections(matrix, removeIndex);//remove connections
+
+                    matrix = ResizeArray(matrix, node.Count);//resize array
+
                     for (int i = 0; i < node.Count; i++) //redo all indexes
                         node[i].index = i;
-                    if (node.Count > 1)
+
+                    if (rootNode >= node.Count) //fix out of bounds error
+                        rootNode--;
+
+                    if (rootNode < 0) rootNode = 0; //fix deletion of all nodes
+
+                    if (node.Count > 1) //calculate distance if there are more than 2 nodes
                         GetSolution(node, matrix, rootNode);
+
                     tempNode0 = null;
                 }
                 //Show distance from node 0
-                if (IsKeyPressed(Raylib.KeyboardKey.KeyF))
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyF) && node.Count > 0)
                 {
                     showDistance = !showDistance;
+                    GetSolution(node, matrix, rootNode);
+                }
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyR)) //randomise connections
+                {
+                    for (int i = 0; i < matrix.GetLength(0); i++)
+                        for (int j = 0; j < matrix.GetLength(0); j++)
+                        {
+                            int rnd = GetRandomValue(-(node.Count * 10), 10);
+                            if (rnd < 0) rnd = 0;
+                            matrix[i, j] = rnd;
+                            matrix[j, i] = rnd;
+                        }
                     GetSolution(node, matrix, rootNode);
                 }
 

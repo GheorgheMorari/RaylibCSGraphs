@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using static RaylibSharp.Raylib.Raylib;
-//ok
+using System.IO;
+
 namespace RaylibSharp
 {
     internal class Program
@@ -190,6 +191,8 @@ namespace RaylibSharp
                 }
                 else
                 {
+                    DrawText("Press W to export graph via text file", 10, 690, 20, Color.BLACK);
+                    DrawText("Press I to import graph via text file (1-line number of vertices,2-nd line starts matrix represenation)", 10, 670, 20, Color.BLACK);
                     DrawText("Click to add node, Press F to toggle Distance", 10, 10, 20, Color.BLACK);
                     if (!firstChoosen)
                         DrawText("Click on a node to select it", 10, 30, 20, Color.BLACK);
@@ -203,6 +206,7 @@ namespace RaylibSharp
 
                 //Show all the connections
                 ShowConnections(matrix, node);
+              
 
                 //Show all the nodes
                 foreach (Nodes thisNode in node)
@@ -243,6 +247,17 @@ namespace RaylibSharp
                 {
                     showDistance = !showDistance;
                     GetSolution(node, matrix, rootNode);
+                }
+                //Import the matrix by pressing I
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyI))
+                {                  
+                    matrix =ReadingTxt.ReadingWriting.ImportMatrix(node);                 
+                }
+                //Export the matrix by pressing W
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyW))
+                {
+                    //Export matrix 
+                    ReadingTxt.ReadingWriting.ExportMatrix(matrix);
                 }
 
                 EndDrawing();

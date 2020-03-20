@@ -1,7 +1,8 @@
-Practical implementation of graphs, based on 3 topic:
-Minimal spanning tree, using prim's algorithm
-Minimal distance using Dijkstra's algorithm
-Maximal flow (Algorithm not specified but we used Ford Fulkerson)
+Practical implementation of graphs, based on 3 topics:
+
+1)Minimal spanning tree, using prim's algorithm
+2)Minimal distance using Dijkstra's algorithm
+3)Maximal flow (Algorithm not specified but we used Ford Fulkerson)
 
 An all-in-one solution complete with GUI and file import-export using files from project, without need to place the file in a specified directory.
 

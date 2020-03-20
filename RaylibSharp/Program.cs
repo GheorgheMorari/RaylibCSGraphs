@@ -244,7 +244,7 @@ namespace RaylibSharp
                 else
                 {
                     DrawText("D - Dijkstra Distance, C - Connections, R - Random, V - Prim's Minimal Spanning Tree, F - Maximum Flow", 10, 10, 20, Color.BLACK);
-                    DrawText("Press I to import graph from file", 10, GetScreenHeight() - 30, 20, Color.BLACK);
+                    DrawText("Press I to import graph from file or press buttons 1 to 7", 10, GetScreenHeight() - 30, 20, Color.BLACK);
                     DrawText("Press W to export graph", 10, GetScreenHeight() - 50, 20, Color.BLACK);
                     DrawText(GetDisplayState(showConnections, showDistance, showFlow, showMST), 10, GetScreenHeight() - 70, 20, Color.BLACK);
 

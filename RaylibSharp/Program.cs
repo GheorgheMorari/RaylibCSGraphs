@@ -338,6 +338,20 @@ namespace RaylibSharp
                     GetSolution(node, matrix, rootNode);
                     GetMST(matrix, rootNode, out treeMatrix);
                 }
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyOne) && inputDistance==false)
+                     matrix = ReadingTxt.ReadingWriting.ImportMatrix(out node,"1.txt");
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyTwo) && inputDistance == false)
+                    matrix = ReadingTxt.ReadingWriting.ImportMatrix(out node, "2.txt");
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyThree) && inputDistance == false)
+                    matrix = ReadingTxt.ReadingWriting.ImportMatrix(out node, "3.txt");
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyFour) && inputDistance == false)
+                    matrix = ReadingTxt.ReadingWriting.ImportMatrix(out node, "4.txt");
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyFive) && inputDistance == false)
+                    matrix = ReadingTxt.ReadingWriting.ImportMatrix(out node, "5.txt");
+                if (IsKeyPressed(Raylib.KeyboardKey.KeySix) && inputDistance == false)
+                    matrix = ReadingTxt.ReadingWriting.ImportMatrix(out node, "6.txt");
+                if (IsKeyPressed(Raylib.KeyboardKey.KeySeven) && inputDistance == false)
+                    matrix = ReadingTxt.ReadingWriting.ImportMatrix(out node, "7.txt");
 
                 EndDrawing();
             }

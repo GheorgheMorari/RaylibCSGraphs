@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="CFG.cs" />
     <Compile Include="FileIO.cs" />
+    <Compile Include="MaxFlow.cs" />
     <Compile Include="Nodes.cs" />
     <Compile Include="Prim.cs" />
     <Compile Include="Program.cs" />

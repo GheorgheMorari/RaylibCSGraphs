@@ -30,7 +30,7 @@ namespace RaylibSharp
             index = index_;
         }
 
-        public void Show(bool showDistance, int currentRoot)
+        public void Show(bool showDistance, bool showFlow, int currentRoot)
         {
             DrawCircleV(pos, radius + border, borderColor); //draw border
             if (currentRoot == index)
@@ -38,10 +38,18 @@ namespace RaylibSharp
             else
                 DrawCircleV(pos, radius, baseColor); //draw circle
 
-            if (!showDistance)
+            if (!showDistance && !showFlow) //show index
                 DrawText(index.ToString(), (int)(pos.x - radius / 3.5), (int)(pos.y - radius / 2.7), 20, Color.BLACK);
             else
-                if (dist == int.MaxValue)
+            if (showFlow) //show maxflow
+            {
+                if (flow == int.MaxValue)
+                    DrawText("INF", (int)(pos.x - radius / 3.5), (int)(pos.y - radius / 2.7), 20, Color.BLACK);
+                else
+                    DrawText(flow.ToString(), (int)(pos.x - radius / 3.5), (int)(pos.y - radius / 2.7), 20, Color.BLACK);
+            }
+            else
+            if (dist == int.MaxValue) //show distance from root node
                 DrawText("INF", (int)(pos.x - radius / 3.5), (int)(pos.y - radius / 2.7), 20, Color.BLACK);
             else
                 DrawText(dist.ToString(), (int)(pos.x - radius / 3.5), (int)(pos.y - radius / 2.7), 20, Color.BLACK);

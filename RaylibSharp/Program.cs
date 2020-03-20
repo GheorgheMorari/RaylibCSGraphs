@@ -29,17 +29,6 @@ namespace RaylibSharp
                     }
         }
 
-        public static void PrintMatrix(int[,] matrix)
-        {
-            Console.Write('\n');
-            for (int i = 0; i < Math.Sqrt(matrix.Length); i++)
-            {
-                for (int j = 0; j < Math.Sqrt(matrix.Length); j++)
-                    Console.Write(matrix[i, j]);
-                Console.Write('\n');
-            }
-        }
-
         public static void DeleteConnections(int[,] matrix, int index)
         {
             int limit = matrix.GetLength(0);
@@ -65,6 +54,14 @@ namespace RaylibSharp
             matrix[node2.index, node1.index] = weight;
         }
 
+        public static void GetFlow(List<Nodes> node, int[,] matrix, int rootNode)
+        {
+            foreach (Nodes thisNode in node)
+            {
+                thisNode.flow = MaxFlow.fordFulkerson(matrix, rootNode, thisNode.index, node.Count);
+            }
+        }
+
         public static void GetSolution(List<Nodes> node, int[,] matrix, int rootNode) //get the distance from the rootNode
         {
             int[] dist = GFG.dijkstra(matrix, rootNode, matrix.GetLength(0));
@@ -77,6 +74,29 @@ namespace RaylibSharp
         public static void GetMST(int[,] matrix, int rootNode, out int[,] treeMatrix)
         {
             treeMatrix = Prim.PrimAlgo(matrix, rootNode);
+        }
+
+        private static string GetDisplayState(bool showConnections, bool showDistance, bool showFlow, bool showMst)
+        {
+            string s = "Showing ";
+            string a = "indexes";
+            string b = "distance with Dijkstra";
+            string c = "distance through Minimum Spanning Tree";
+            string d = "maxflow using Ford Fulkerson";
+            string e = "maxflow through Minimum Spanning Tree";
+
+            if (!showConnections && showDistance && !showFlow && showMst) //distance through mst
+                return s + c;
+            if (showDistance && !showFlow) //distance
+                return s + b;
+
+            if (!showConnections && !showDistance && showFlow && showMst) //flow through mst
+                return s + e;
+            if (!showDistance && showFlow) //flow
+                return s + d;
+
+            //if (showConnections && !showDistance && !showFlow && !showMst)
+            return s + a;
         }
 
         public static void Main()
@@ -100,6 +120,7 @@ namespace RaylibSharp
             bool showDistance = false;
             bool showMST = false; //minimal spanning tree
             bool showConnections = true;
+            bool showFlow = false;
 
             //Distance input stuff
             int letterCount = 0;
@@ -152,6 +173,7 @@ namespace RaylibSharp
                                 tempNode2 = null;
                                 tempNode0 = null;
                                 GetSolution(node, matrix, rootNode);
+                                GetFlow(node, matrix, rootNode);
                                 GetMST(matrix, rootNode, out treeMatrix);
                             }
                         }
@@ -200,8 +222,18 @@ namespace RaylibSharp
                         if (showDistance)
                             GetSolution(node, matrix, rootNode);
 
+                        if (showFlow)
+                            GetFlow(node, matrix, rootNode);
+
                         if (showMST)
+                        {
                             GetMST(matrix, rootNode, out treeMatrix);
+                            if (!showConnections)
+                            {
+                                GetSolution(node, treeMatrix, rootNode);
+                                GetFlow(node, treeMatrix, rootNode);
+                            }
+                        }
                     }
                     int x = (int)(tempNode1.pos.x + tempNode2.pos.x) / 2;
                     int y = (int)(tempNode1.pos.y + tempNode2.pos.y) / 2;
@@ -211,9 +243,10 @@ namespace RaylibSharp
                 }
                 else
                 {
-                    DrawText("F - Dijkstra Distance, C - Connections, R - Random, V - Prim's Minimal Spanning Tree", 10, 10, 20, Color.BLACK);
-                    DrawText("Press W to export graph", 10, GetScreenHeight() - 30, 20, Color.BLACK);
-                    DrawText("Press I to import graph", 10, GetScreenHeight() - 50, 20, Color.BLACK);
+                    DrawText("D - Dijkstra Distance, C - Connections, R - Random, V - Prim's Minimal Spanning Tree, F - Maximum Flow", 10, 10, 20, Color.BLACK);
+                    DrawText("Press I to import graph from file", 10, GetScreenHeight() - 30, 20, Color.BLACK);
+                    DrawText("Press W to export graph", 10, GetScreenHeight() - 50, 20, Color.BLACK);
+                    DrawText(GetDisplayState(showConnections, showDistance, showFlow, showMST), 10, GetScreenHeight() - 70, 20, Color.BLACK);
 
                     if (!firstChoosen)
                         DrawText("Click on a node to select it", 10, 30, 20, Color.BLACK);
@@ -235,7 +268,7 @@ namespace RaylibSharp
                 //Show all the nodes
                 foreach (Nodes thisNode in node)
                 {
-                    thisNode.Show(showDistance, rootNode);
+                    thisNode.Show(showDistance, showFlow, rootNode);
                 }
                 //Highlight selected node
                 if (tempNode0 == tempNode1)
@@ -278,24 +311,37 @@ namespace RaylibSharp
                     if (node.Count > 1) //calculate distance if there are more than 2 nodes
                     {
                         GetSolution(node, matrix, rootNode);
+                        GetFlow(node, matrix, rootNode);
                         GetMST(matrix, rootNode, out treeMatrix);
                     }
                     if (showMST)
                     { //rebuild the MST
                         GetMST(matrix, rootNode, out treeMatrix);
                         GetSolution(node, treeMatrix, rootNode);
+                        GetFlow(node, treeMatrix, rootNode);
                     }
                     tempNode0 = null;
                 }
 
                 //Show distance from rootNode
-                if (IsKeyPressed(Raylib.KeyboardKey.KeyF) && node.Count > 0)
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyD) && node.Count > 0)
                 {
                     showDistance = !showDistance;
+                    showFlow = false;
                     if (!showMST)
                         GetSolution(node, matrix, rootNode);
                     else
                         GetSolution(node, treeMatrix, rootNode);
+                }
+                //Show
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyF) && node.Count > 0)
+                {
+                    showFlow = !showFlow;
+                    showDistance = false;
+                    if (!showMST)
+                        GetFlow(node, matrix, rootNode);
+                    else
+                        GetFlow(node, treeMatrix, rootNode);
                 }
 
                 if (IsKeyPressed(Raylib.KeyboardKey.KeyV) && node.Count > 0)//view MST
@@ -303,15 +349,26 @@ namespace RaylibSharp
                     showMST = !showMST;
                     GetMST(matrix, rootNode, out treeMatrix);
                     GetSolution(node, treeMatrix, rootNode);
+                    GetFlow(node, treeMatrix, rootNode);
                 }
 
                 if (IsKeyPressed(Raylib.KeyboardKey.KeyC) && node.Count > 0)//toggle connections
                 {
                     showConnections = !showConnections;
                     if (!showConnections)
-                        GetSolution(node, treeMatrix, rootNode);
-                    else
-                        GetSolution(node, matrix, rootNode);
+                    {
+                        if (showDistance)
+                            GetSolution(node, treeMatrix, rootNode);
+                        if (showFlow)
+                            GetFlow(node, treeMatrix, rootNode);
+                    }
+                    if (showConnections)
+                    {
+                        if (showDistance)
+                            GetSolution(node, matrix, rootNode);
+                        if (showFlow)
+                            GetFlow(node, matrix, rootNode);
+                    }
                 }
                 //Import the matrix by pressing I
                 if (IsKeyPressed(Raylib.KeyboardKey.KeyI))
@@ -336,6 +393,7 @@ namespace RaylibSharp
                             matrix[j, i] = rnd;
                         }
                     GetSolution(node, matrix, rootNode);
+                    GetFlow(node, matrix, rootNode);
                     GetMST(matrix, rootNode, out treeMatrix);
                 }
 

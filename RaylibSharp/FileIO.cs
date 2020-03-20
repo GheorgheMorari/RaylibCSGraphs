@@ -4,59 +4,50 @@ using System.Collections.Generic;
 using System.IO;
 using RaylibSharp;
 
-
 namespace ReadingTxt
 {
     public class ReadingWriting
     {
         //importing matrix
-        public static int[,] ImportMatrix(List<Nodes> node)
+        public static int[,] ImportMatrix(out List<Nodes> node, string filename = "import.txt")
         {
-            Random rnd = new Random(); //random location for nodes
-            float x = 650, y = 360;
-            int[,] matrix1 = new int[10, 10];
-            int n = 0;//size of the matrix
-            int counter = 0;
+            node = new List<Nodes>();
+            int[,] matrix1;
+            int n;//size of the matrix
             string line;
-            StreamReader file = new StreamReader(@"D:\import.txt");//IMPORTANT!! to not forget to change location of the IMPORT file if it needed
-            int i = -1, j;
-            while ((line = file.ReadLine()) != null)
+            StreamReader file = new StreamReader(@"../../" + filename);
+
+            n = Int32.Parse(file.ReadLine());
+            matrix1 = new int[n, n];
+            for (int i = 0; i < n; i++)
             {
-                j = 0;
-                foreach (var line1 in line.Trim().Split(' '))
+                line = file.ReadLine();
+                var lines = line.Trim().Split(' ');
+                for (int j = 0; j < n; j++)
                 {
-                    if (counter == 0) //reading size of the input matrix
-                    {
-                        int.TryParse(line1.Trim(), out n);//1-st line number of nodes
-                        counter++;
-                        for (int m = 0; m < n; m++)
-                        {
-                            Vector2 pos1 = new Vector2(x, y);
-                            node.Add(new Nodes(pos1, node.Count)); //placing randomly node
-                            x = rnd.Next(60, 1200); //generating random variable of position x
-                            y = rnd.Next(70, 700); //generating random variable of position y
-                        }
-                    }
-                    else
-                    {
-                        int.TryParse(line1.Trim(), out matrix1[i, j]);//weight of an edge
-                        if (j < n)
-                            j++;
-                    }
+                    int.TryParse(lines[j].Trim(), out matrix1[i, j]);//1-st line number of nodes
                 }
-                if (i < n)
-                    i++;
             }
+
+            n = Int32.Parse(file.ReadLine());
+            for (int k = 0; k < n; k++)
+            {
+                Vector2 coords = new Vector2();
+                coords.x = Int32.Parse(file.ReadLine());
+                coords.y = Int32.Parse(file.ReadLine());
+                node.Add(new Nodes(coords, node.Count));
+            }
+
             file.Close();
             matrix1 = Program.ResizeArray(matrix1, n);
             return matrix1;
         }
-        public static void ExportMatrix(int[,] matrix) //exporting matrix
-        {
 
+        public static void ExportMatrix(int[,] matrix, List<Nodes> node, string filename = "export.txt") //exporting matrix
+        {
             int len = matrix.GetLength(0);
             int count = 0;
-            using (TextWriter filePath = new StreamWriter(@"D:\export.txt"))//location of the file
+            using (TextWriter filePath = new StreamWriter(@"../../" + filename))//location of the file
             {
                 filePath.WriteLine(len);
                 for (int i = 0; i < len; i++)
@@ -78,15 +69,17 @@ namespace ReadingTxt
                     }
                     filePath.WriteLine();
                 }
+                filePath.WriteLine(node.Count.ToString());
+
+                for (int i = 0; i < node.Count; i++)
+                {
+                    filePath.WriteLine(((int)node[i].pos.x).ToString());
+                    filePath.WriteLine(((int)node[i].pos.y).ToString());
+                }
+
                 filePath.WriteLine("Number of vertices in the graph:" + len);
                 filePath.WriteLine("Number of edges in the graph:" + (count / 2));
             }
         }
-
-
     }
-
-}      
-     
-  
-
+}

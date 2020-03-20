@@ -5,11 +5,12 @@ namespace RaylibSharp
 {
     public class Nodes
     {
-        public Vector2 pos;      //the vector of the positions use pos.x and pos.y
-        public int index;        //the index of the node
-        public int dist;     //the distance from the node 0
-        public float radius = 17;//the radius of the node
-        public float border = 2; //border radius + radius
+        public Vector2 pos;         //the vector of the positions use pos.x and pos.y
+        public int index;           //the index of the node
+        public int dist;            //the distance from the rootNode
+        public int flow;            //the maximum possible flow
+        public float radius = 17;   //the radius of the node
+        public float border = 2;    //border radius + radius
         private Color baseColor;
         private Color borderColor;
         private Color highlight;

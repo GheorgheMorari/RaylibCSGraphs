@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using static RaylibSharp.Raylib.Raylib;
-using System.IO;
 
 namespace RaylibSharp
 {
@@ -213,8 +212,8 @@ namespace RaylibSharp
                 else
                 {
                     DrawText("F - Dijkstra Distance, C - Connections, R - Random, V - Prim's Minimal Spanning Tree", 10, 10, 20, Color.BLACK);
-                    DrawText("Press W to export graph via text file", 10, 690, 20, Color.BLACK);
-                    DrawText("Press I to import graph via text file (1-line number of vertices,2-nd line starts matrix represenation)", 10, 670, 20, Color.BLACK);
+                    DrawText("Press W to export graph", 10, GetScreenHeight() - 30, 20, Color.BLACK);
+                    DrawText("Press I to import graph", 10, GetScreenHeight() - 50, 20, Color.BLACK);
 
                     if (!firstChoosen)
                         DrawText("Click on a node to select it", 10, 30, 20, Color.BLACK);
@@ -289,7 +288,7 @@ namespace RaylibSharp
                     tempNode0 = null;
                 }
 
-                //Show distance from node 0
+                //Show distance from rootNode
                 if (IsKeyPressed(Raylib.KeyboardKey.KeyF) && node.Count > 0)
                 {
                     showDistance = !showDistance;
@@ -317,13 +316,13 @@ namespace RaylibSharp
                 //Import the matrix by pressing I
                 if (IsKeyPressed(Raylib.KeyboardKey.KeyI))
                 {
-                    matrix = ReadingTxt.ReadingWriting.ImportMatrix(node);
+                    matrix = ReadingTxt.ReadingWriting.ImportMatrix(out node);
                 }
                 //Export the matrix by pressing W
                 if (IsKeyPressed(Raylib.KeyboardKey.KeyW))
                 {
                     //Export matrix
-                    ReadingTxt.ReadingWriting.ExportMatrix(matrix);
+                    ReadingTxt.ReadingWriting.ExportMatrix(matrix, node);
                 }
 
                 if (IsKeyPressed(Raylib.KeyboardKey.KeyR)) //randomise connections

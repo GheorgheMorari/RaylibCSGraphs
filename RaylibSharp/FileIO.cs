@@ -9,11 +9,16 @@ namespace ReadingTxt
     public class ReadingWriting
     {
         //importing matrix
-        public static int[,] ImportMatrix(out List<Nodes> node , out int[,] matrix, string filename = "import.txt")
+        public static int[,] ImportMatrix(out List<Nodes> node, out int[,] matrix, string filename = "import.txt")
         {
             node = new List<Nodes>();
             int n;//size of the matrix
             string line;
+            matrix = new int[0, 0];
+
+            if (!File.Exists(@"../../" + filename)) //check if file exists
+                return matrix;
+
             StreamReader file = new StreamReader(@"../../" + filename);
 
             n = Int32.Parse(file.ReadLine());

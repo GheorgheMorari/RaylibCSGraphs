@@ -9,23 +9,22 @@ namespace ReadingTxt
     public class ReadingWriting
     {
         //importing matrix
-        public static int[,] ImportMatrix(out List<Nodes> node, string filename = "import.txt")
+        public static int[,] ImportMatrix(out List<Nodes> node , out int[,] matrix, string filename = "import.txt")
         {
             node = new List<Nodes>();
-            int[,] matrix1;
             int n;//size of the matrix
             string line;
             StreamReader file = new StreamReader(@"../../" + filename);
 
             n = Int32.Parse(file.ReadLine());
-            matrix1 = new int[n, n];
+            matrix = new int[n, n];
             for (int i = 0; i < n; i++)
             {
                 line = file.ReadLine();
                 var lines = line.Trim().Split(' ');
                 for (int j = 0; j < n; j++)
                 {
-                    int.TryParse(lines[j].Trim(), out matrix1[i, j]);//1-st line number of nodes
+                    int.TryParse(lines[j].Trim(), out matrix[i, j]);//1-st line number of nodes
                 }
             }
 
@@ -39,8 +38,8 @@ namespace ReadingTxt
             }
 
             file.Close();
-            matrix1 = Program.ResizeArray(matrix1, n);
-            return matrix1;
+            matrix = Program.ResizeArray(matrix, n);
+            return matrix;
         }
 
         public static void ExportMatrix(int[,] matrix, List<Nodes> node, string filename = "export.txt") //exporting matrix

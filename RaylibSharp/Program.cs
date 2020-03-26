@@ -58,7 +58,7 @@ namespace RaylibSharp
         {
             foreach (Nodes thisNode in node)
             {
-                thisNode.flow = MaxFlow.fordFulkerson(matrix, rootNode, thisNode.index, node.Count);
+                thisNode.flow = MaxFlow.fordFulkerson(matrix, rootNode, thisNode.index, matrix.GetLength(0));
             }
         }
 
@@ -357,9 +357,9 @@ namespace RaylibSharp
                     showConnections = !showConnections;
                     if (!showConnections)
                     {
-                        if (showDistance)
+                        if (showDistance && showMST)
                             GetSolution(node, treeMatrix, rootNode);
-                        if (showFlow)
+                        if (showFlow && showMST)
                             GetFlow(node, treeMatrix, rootNode);
                     }
                     if (showConnections)

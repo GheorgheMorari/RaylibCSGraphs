@@ -1,6 +1,6 @@
-﻿using System;
+﻿using RaylibSharp.Raylib.Types;
+using System;
 using System.Runtime.InteropServices;
-using RaylibSharp.Raylib.Types;
 
 namespace RaylibSharp //kek
 {

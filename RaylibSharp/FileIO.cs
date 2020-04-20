@@ -1,20 +1,20 @@
-﻿using RaylibSharp.Raylib.Types;
+﻿using RaylibSharp;
+using RaylibSharp.Raylib.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using RaylibSharp;
 
 namespace ReadingTxt
 {
     public class ReadingWriting
     {
         //importing matrix
-        public static int[,] ImportMatrix(out List<Nodes> node, out int[,] matrix, string filename = "import.txt")
+        public static int[,] ImportMatrix(out List<Nodes> node, string filename = "import.txt")
         {
             node = new List<Nodes>();
             int n;//size of the matrix
             string line;
-            matrix = new int[0, 0];
+            int[,] matrix = new int[0, 0];
 
             if (!File.Exists(@"../../" + filename)) //check if file exists
                 return matrix;
@@ -39,7 +39,7 @@ namespace ReadingTxt
                 Vector2 coords = new Vector2();
                 coords.x = Int32.Parse(file.ReadLine());
                 coords.y = Int32.Parse(file.ReadLine());
-                node.Add(new Nodes(coords, node.Count));
+                node.Add(new Nodes(coords, node.Count, Program.centerNode));
             }
 
             file.Close();

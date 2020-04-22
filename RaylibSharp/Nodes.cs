@@ -31,7 +31,7 @@ namespace RaylibSharp
             borderColor = new Color(130, 45, 45);
             index = index_;
             originalPos.x = pos_.x - centerNode.pos.x;
-            originalPos.x = pos_.y - centerNode.pos.y;
+            originalPos.y = pos_.y - centerNode.pos.y;
             pos = originalPos;
             modpos = pos;
         }

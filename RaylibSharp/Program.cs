@@ -29,7 +29,7 @@ namespace RaylibSharp
         public static bool showConnections = true;
         public static bool showText = true;
         public static bool showCircles = true;
-        public static bool edit = false;
+        public static bool edit = true;
 
         //Adjacency matrix
         public static int[,] matrix = new int[2, 2];
@@ -89,6 +89,7 @@ namespace RaylibSharp
         {
             InitWindow(1800, 980, "Dijkstra algorithm");
             SetTargetFPS(24);
+            centerNode = new Nodes(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
             centerNode = Nodes.makeCenter(centerNode);
             while (!WindowShouldClose())
             {

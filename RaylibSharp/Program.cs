@@ -1,6 +1,9 @@
 ﻿using RaylibSharp.Raylib.Types;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using static RaylibSharp.Raylib.Raylib;
 
 namespace RaylibSharp
@@ -87,15 +90,17 @@ namespace RaylibSharp
 
         public static void Main()
         {
-            InitWindow(1800, 980, "Dijkstra algorithm");
-            SetTargetFPS(24);
+            const int targetFps = 60;
+            InitWindow(1800, 980, "PBL Matrix Linear Transformations");
+            SetTargetFPS(targetFps);
             centerNode = new Nodes(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
             centerNode = Nodes.makeCenter(centerNode);
+            Stopwatch stopwatch = new Stopwatch();
             while (!WindowShouldClose())
             {
+                stopwatch.Start();
                 BeginDrawing();
                 ClearBackground(Color.WHITE);
-
                 if (IsMouseButtonPressed(0)) //Click to add new node
                 {
                     foreach (Nodes thisNode in node)
@@ -140,8 +145,10 @@ namespace RaylibSharp
                     }
                     else
                     {
-                        node.Add(new Nodes(GetMousePosition(), node.Count, centerNode)); //if there is no colision add new node to the list
+                        var tmp = new Nodes(GetMousePosition(), node.Count, centerNode);
+                        node.Add(tmp); //if there is no colision add new node to the list
                         matrix = ResizeArray(matrix, node.Count);
+                        tmp.transform(TMatrix, centerNode, angle);
                     }
                 }
 
@@ -150,7 +157,7 @@ namespace RaylibSharp
                     string buf = "";
                     DrawText("Press I to import graph from file or press buttons 1 to 7", 10, GetScreenHeight() - 30, 20, Color.BLACK);
                     DrawText("Press W to export graph", 10, GetScreenHeight() - 50, 20, Color.BLACK);
-                    DrawText("Toggle: C-Connections, V-Nodes, G-text, T-resetMatrix, F-resetAngle", 10, 10, 20, Color.BLACK);
+                    DrawText("Toggle: C-Connections, V-Nodes, G-text, R-resetMatrix, F-resetAngle", 10, 10, 20, Color.BLACK);
                     buf = (1 - TMatrix[0, 0] + (float)Math.Cos(angle)).ToString();
                     DrawText(buf, 30, 30, 20, Color.BLACK);
                     buf = (TMatrix[0, 1] - (float)Math.Sin(angle)).ToString();
@@ -199,7 +206,12 @@ namespace RaylibSharp
                 }
 
                 keyboardInteraction.keyboardInteractions();
+                stopwatch.Stop();
+                DrawText("TimeForFrame" + stopwatch.ElapsedMilliseconds, 10, GetScreenHeight() - 70, 20, Color.BLACK);
                 EndDrawing();
+                int kek = (1000 / targetFps - stopwatch.ElapsedMilliseconds < 0) ? 0 : 1000 / (int)(targetFps - stopwatch.ElapsedMilliseconds);
+                stopwatch.Reset();
+                Thread.Sleep(kek);
             }
 
             CloseWindow();

@@ -1,5 +1,8 @@
 ﻿using RaylibSharp.Raylib.Types;
 using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using static RaylibSharp.Raylib.Raylib;
 
 namespace RaylibSharp
@@ -9,8 +12,32 @@ namespace RaylibSharp
         private const float increment = (float)0.1;
         private const float aincrement = (float)3.14 / 180;
 
+        public static void change()
+        {
+            Parallel.For(0, Program.node.Count, index =>
+            {
+                if (Program.node[index] != Program.centerNode)
+                {
+                    Program.node[index].transform(Program.TMatrix, Program.centerNode, Program.angle);
+                }
+            });
+        }
+
         private static void transformations() //Transformation changes
         {
+            float C_angle = Program.angle;
+            float[,] CMatrix = { { Program.TMatrix[0, 0], Program.TMatrix[0, 1] },
+                                 { Program.TMatrix[1, 0], Program.TMatrix[1, 1] } }; ;
+
+            if (IsKeyPressed(Raylib.KeyboardKey.KeyR)) //reset TMatrix
+            {
+                Program.TMatrix = new float[2, 2] { { 1, 0 }, { 0, 1 } };
+            }
+            if (IsKeyPressed(Raylib.KeyboardKey.KeyF)) //reset angle
+            {
+                Program.angle = 0;
+            }
+
             if (IsKeyDown(Raylib.KeyboardKey.KeyQ)) //decrease angle
                 Program.angle -= aincrement;
             if (IsKeyDown(Raylib.KeyboardKey.KeyE)) //increase angle
@@ -35,14 +62,12 @@ namespace RaylibSharp
                 Program.TMatrix[0, 0] -= increment;
             if (IsKeyDown(Raylib.KeyboardKey.KeyRight))
                 Program.TMatrix[0, 0] += increment;
-
-            foreach (Nodes thisNode in Program.node)
-            {
-                if (thisNode != Program.centerNode)
-                {
-                    thisNode.transform(Program.TMatrix, Program.centerNode, Program.angle);
-                }
-            }
+            bool MatrixChange = (CMatrix[0, 0] != Program.TMatrix[0, 0] ||
+                                 CMatrix[0, 1] != Program.TMatrix[0, 1] ||
+                                 CMatrix[1, 0] != Program.TMatrix[1, 0] ||
+                                 CMatrix[1, 1] != Program.TMatrix[1, 1]);
+            if (C_angle != Program.angle || MatrixChange)
+                change();
         }
 
         public static void keyboardInteractions()
@@ -69,15 +94,6 @@ namespace RaylibSharp
             {
                 //Export matrix
                 ReadingTxt.ReadingWriting.ExportMatrix(Program.matrix, Program.node);
-            }
-
-            if (IsKeyPressed(Raylib.KeyboardKey.KeyT)) //reset TMatrix
-            {
-                Program.TMatrix = new float[2, 2] { { 1, 0 }, { 0, 1 } };
-            }
-            if (IsKeyPressed(Raylib.KeyboardKey.KeyF)) //reset angle
-            {
-                Program.angle = 0;
             }
 
             if (IsKeyPressed(Raylib.KeyboardKey.KeyZ) && Program.edit) //randomise connections

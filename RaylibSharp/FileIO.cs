@@ -44,6 +44,7 @@ namespace ReadingTxt
 
             file.Close();
             matrix = Program.ResizeArray(matrix, n);
+            keyboardInteraction.change();
             return matrix;
         }
 

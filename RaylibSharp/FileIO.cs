@@ -6,12 +6,12 @@ using System.IO;
 
 namespace ReadingTxt
 {
-    public class ReadingWriting
+    public static class ReadingWriting
     {
         //importing matrix
-        public static int[,] ImportMatrix(out List<Nodes> node, string filename = "import.txt")
+        public static int[,] ImportMatrix(out List<NodeClass> node, string filename = "import.txt")
         {
-            node = new List<Nodes>();
+            node = new List<NodeClass>();
             int n;//size of the matrix
             string line;
             int[,] matrix = new int[0, 0];
@@ -39,16 +39,16 @@ namespace ReadingTxt
                 Vector2 coords = new Vector2();
                 coords.x = Int32.Parse(file.ReadLine());
                 coords.y = Int32.Parse(file.ReadLine());
-                node.Add(new Nodes(coords, node.Count, Program.centerNode));
+                node.Add(new NodeClass(coords, node.Count, Program.CenterNode));
             }
 
             file.Close();
             matrix = Program.ResizeArray(matrix, n);
-            keyboardInteraction.change();
+            KeyboardInteraction.Change();
             return matrix;
         }
 
-        public static void ExportMatrix(int[,] matrix, List<Nodes> node, string filename = "export.txt") //exporting matrix
+        public static void ExportMatrix(int[,] matrix, List<NodeClass> node, string filename = "export.txt") //exporting matrix
         {
             int len = matrix.GetLength(0);
             int count = 0;
@@ -78,8 +78,8 @@ namespace ReadingTxt
 
                 for (int i = 0; i < node.Count; i++)
                 {
-                    filePath.WriteLine(((int)node[i].pos.x).ToString());
-                    filePath.WriteLine(((int)node[i].pos.y).ToString());
+                    filePath.WriteLine(((int)node[i].OriginalPos.x).ToString());
+                    filePath.WriteLine(((int)node[i].OriginalPos.y).ToString());
                 }
 
                 filePath.WriteLine("Number of vertices in the graph:" + len);

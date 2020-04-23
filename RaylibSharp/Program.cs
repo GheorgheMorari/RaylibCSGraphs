@@ -1,100 +1,90 @@
 ﻿using RaylibSharp.Raylib.Types;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Diagnostics;
-using System.Threading.Tasks;
+using System.Threading;
 using static RaylibSharp.Raylib.Raylib;
 
 namespace RaylibSharp
 {
-    public class Program
+    public static class Program
     {
-        //The main list of nodes
-        static public List<Nodes> node = new List<Nodes>();
+        public static List<NodeClass> NodeList = new List<NodeClass>();
 
         //Temporary nodes
-        static public Nodes tempNode0 = new Nodes();
+        public static NodeClass NodeHitByMouse = new NodeClass();
+        public static NodeClass NodeSelected = new NodeClass();
+        public static NodeClass NodeToConnect;
 
-        static public Nodes tempNode1 = new Nodes();
-        static public Nodes tempNode2;
-        static public Nodes centerNode = new Nodes(new Vector2(0, 0), 0);
+        public static NodeClass CenterNode;
 
-        //Colors and thickness
-        static public Color regularConnection = new Color(200, 200, 200);
+        public static Color ConnectionColor = new Color(200, 200, 200);
+        public const float ConnectionThickness = 3F;
 
-        static public float regularThickness = 3F;
+        private static bool Colision = false;
+        private static bool IsSelected = false;
 
-        //Boolean flags
-
-        public static bool colision = false;
-        public static bool firstChoosen = false;
         public static bool showConnections = true;
-        public static bool showText = true;
-        public static bool showCircles = true;
+        public static bool ShowText = true;
+        public static bool ShowNodes = true;
         public static bool edit = true;
 
-        //Adjacency matrix
-        public static int[,] matrix = new int[2, 2];
+        //Adjacency AdjacencyMatrix
+        public static int[,] AdjacencyMatrix = new int[2, 2];
 
         //Tranformations
-        public static float[,] TMatrix = new float[2, 2] { { 1, 0 }, { 0, 1 } };
+        public static float[,] TransformationMatrix = new float[2, 2] { { 1, 0 }, { 0, 1 } };
 
-        public static float angle = 0;
+        public static float TransformationAngle = 0;
 
-        public static int[,] ResizeArray(int[,] original, int size)
+        public static int[,] ResizeArray(int[,] Array, int NewSize)
         {
-            var newArray = new int[size, size];
-            int oSize = Math.Min(original.GetLength(0), size);
+            var newArray = new int[NewSize, NewSize];
+            int oSize = Math.Min(Array.GetLength(0), NewSize);
             for (int i = 0; i < oSize; i++)
                 for (int j = 0; j < oSize; j++)
-                    newArray[i, j] = original[i, j];
+                    newArray[i, j] = Array[i, j];
             return newArray;
         }
 
-        public static void ShowConnections(int[,] matrix, List<Nodes> node, Color connectionColor, float thickness) //show all connections
+        public static void DrawConnections(int[,] AdjacencyMatrix, List<NodeClass> NodeList, Color ConnectionColor, float thickness)
         {
-            int len = matrix.GetLength(0);
+            int len = AdjacencyMatrix.GetLength(0);
             for (int i = 0; i < len; i++)
                 for (int j = i; j < len; j++)
-                    if (matrix[i, j] > 0)
+                    if (AdjacencyMatrix[i, j] > 0)
                     {
-                        DrawLineEx(node[i].modpos, node[j].modpos, thickness, connectionColor);
+                        DrawLineEx(NodeList[i].TransformedPos, NodeList[j].TransformedPos, thickness, ConnectionColor);
                     }
         }
 
-        public static void DeleteConnections(int[,] matrix, int index)
+        public static void DeleteConnections(int[,] AdjacencyMatrix, int index)
         {
-            int limit = matrix.GetLength(0);
+            int limit = AdjacencyMatrix.GetLength(0);
             for (int i = index; i < limit - 1; i++) //shift the colls left
                 for (int j = 0; j < limit; j++)
-                    matrix[i, j] = matrix[i + 1, j];
+                    AdjacencyMatrix[i, j] = AdjacencyMatrix[i + 1, j];
 
             for (int j = 0; j < limit; j++) //delete the remaining weights after shifting
-                matrix[limit - 1, j] = 0;
+                AdjacencyMatrix[limit - 1, j] = 0;
 
             for (int i = index; i < limit - 1; i++) //shift the rows up
                 for (int j = 0; j < limit; j++)
-                    matrix[j, i] = matrix[j, i + 1];
+                    AdjacencyMatrix[j, i] = AdjacencyMatrix[j, i + 1];
 
             for (int j = 0; j < limit; j++)//delete the remaining weights after shifting
-                matrix[j, limit - 1] = 0;
-        }
-
-        public static void AddConnection(int[,] matrix, Nodes node1, Nodes node2, int weight) //add connection to the matrix
-        {
-            if (node1 == node2) return;
-            matrix[node1.index, node2.index] = weight;
-            matrix[node2.index, node1.index] = weight;
+                AdjacencyMatrix[j, limit - 1] = 0;
         }
 
         public static void Main()
         {
-            const int targetFps = 60;
+            const int TargetFPS = 60;
             InitWindow(1800, 980, "PBL Matrix Linear Transformations");
-            SetTargetFPS(targetFps);
-            centerNode = new Nodes(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
-            centerNode = Nodes.makeCenter(centerNode);
+            SetTargetFPS(TargetFPS);
+
+            CenterNode = new NodeClass(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
+            CenterNode = NodeClass.MakeCenter(CenterNode);
+
             Stopwatch stopwatch = new Stopwatch();
             while (!WindowShouldClose())
             {
@@ -103,113 +93,112 @@ namespace RaylibSharp
                 ClearBackground(Color.WHITE);
                 if (IsMouseButtonPressed(0)) //Click to add new node
                 {
-                    foreach (Nodes thisNode in node)
-                        if (CheckCollisionPointCircle(GetMousePosition(), thisNode.modpos, thisNode.radius))
-                        { //check if mouse is over all points, if yes then colision is set to true
-                            colision = true;
-                            tempNode0 = thisNode;
+                    Vector2 MousePos = GetMousePosition();
+                    foreach (NodeClass ThisNode in NodeList)
+                        if (ThisNode.CheckIfHitBy(MousePos))
+                        { 
+                            Colision = true;
+                            NodeHitByMouse = ThisNode;
                             break;
                         }
 
-                    if (colision) // if there is a colision
+                    if (Colision)
                     {
-                        if (!firstChoosen) //choose the first node
+                        if (!IsSelected) //choose the first node
                         {
-                            firstChoosen = true;
-                            tempNode1 = tempNode0; // set the tempNode1 to be the node that was collided
+                            IsSelected = true;
+                            NodeSelected = NodeHitByMouse; 
                         }
                         else //choose the second node
                         {
-                            firstChoosen = false;
-                            tempNode2 = tempNode0; //set the second node
-                            if (tempNode2 != tempNode1) //No distance to itself
+                            IsSelected = false;
+                            NodeToConnect = NodeHitByMouse;
+                            if (NodeToConnect != NodeSelected) //No distance to itself
                             {
-                                AddConnection(matrix, tempNode1, tempNode2, 1);
+                                AdjacencyMatrix[NodeToConnect.NodeIndex, NodeSelected.NodeIndex] = 1;
+                                AdjacencyMatrix[NodeSelected.NodeIndex, NodeToConnect.NodeIndex] = 1;
                             }
-                            else //Choose the new root node
+                            else //If NodeSelected is the NodeHitByMouse then change CenterNode
                             {
-                                centerNode = Nodes.makeCenter(tempNode1);
-                                foreach (Nodes thisNode in node)
+                                CenterNode = NodeClass.MakeCenter(NodeSelected);
+                                foreach (NodeClass ThisNode in NodeList)
                                 {
-                                    if (thisNode != centerNode)
+                                    if (ThisNode != CenterNode)
                                     {
-                                        thisNode.setCenter(centerNode);
-                                        thisNode.transform(TMatrix, centerNode, angle);
+                                        ThisNode.OffsetNodeToCenter(CenterNode);
+                                        ThisNode.Transform(TransformationMatrix, CenterNode, TransformationAngle);
                                     }
                                 }
-                                tempNode2 = null;
-                                tempNode0 = null;
+                                NodeToConnect = null;
+                                NodeHitByMouse = null;
                             }
                         }
-                        colision = false;
+                        Colision = false;
                     }
-                    else
+                    else //Add new node
                     {
-                        var tmp = new Nodes(GetMousePosition(), node.Count, centerNode);
-                        node.Add(tmp); //if there is no colision add new node to the list
-                        matrix = ResizeArray(matrix, node.Count);
-                        tmp.transform(TMatrix, centerNode, angle);
+                        var NewNode = new NodeClass(GetMousePosition(), NodeList.Count, CenterNode);
+                        NodeList.Add(NewNode); //if there is no Colision add new node to the list
+                        AdjacencyMatrix = ResizeArray(AdjacencyMatrix, NodeList.Count);
+                        NewNode.Transform(TransformationMatrix, CenterNode, TransformationAngle);
                     }
                 }
 
-                if (showText)
+                if (ShowText)
                 {
-                    string buf = "";
                     DrawText("Press I to import graph from file or press buttons 1 to 7", 10, GetScreenHeight() - 30, 20, Color.BLACK);
                     DrawText("Press W to export graph", 10, GetScreenHeight() - 50, 20, Color.BLACK);
                     DrawText("Toggle: C-Connections, V-Nodes, G-text, R-resetMatrix, F-resetAngle", 10, 10, 20, Color.BLACK);
-                    buf = (1 - TMatrix[0, 0] + (float)Math.Cos(angle)).ToString();
+                    
+                    string buf = (1 - TransformationMatrix[0, 0] + (float)Math.Cos(TransformationAngle)).ToString();
                     DrawText(buf, 30, 30, 20, Color.BLACK);
-                    buf = (TMatrix[0, 1] - (float)Math.Sin(angle)).ToString();
+                    buf = (TransformationMatrix[0, 1] - (float)Math.Sin(TransformationAngle)).ToString();
                     DrawText(buf, 170, 30, 20, Color.BLACK);
-                    buf = (TMatrix[1, 0] + (float)Math.Sin(angle)).ToString();
+                    buf = (TransformationMatrix[1, 0] + (float)Math.Sin(TransformationAngle)).ToString();
                     DrawText(buf, 30, 60, 20, Color.BLACK);
-                    buf = (1 - TMatrix[1, 1] + (float)Math.Cos(angle)).ToString();
+                    buf = (1 - TransformationMatrix[1, 1] + (float)Math.Cos(TransformationAngle)).ToString();
                     DrawText(buf, 170, 60, 20, Color.BLACK);
-                    buf = (angle / (float)3.14 * 180).ToString();
+
+                    buf = (TransformationAngle / (float)3.14 * 180).ToString();
                     DrawText("Angle in Degrees:" + buf, 30, 90, 20, Color.BLACK);
                 }
 
                 //Show all the connections
                 if (showConnections)
-                    ShowConnections(matrix, node, regularConnection, regularThickness);
+                    DrawConnections(AdjacencyMatrix, NodeList, ConnectionColor, ConnectionThickness);
 
                 //Show all the nodes
-                if (showCircles)
-                    foreach (Nodes thisNode in node)
+                if (ShowNodes)
+                    foreach (NodeClass ThisNode in NodeList)
                     {
-                        thisNode.Show();
+                        ThisNode.DisplayNode();
                     }
+
                 //Highlight selected node
-                if (tempNode0 == tempNode1)
+                if (NodeHitByMouse == NodeSelected)
                 {
-                    tempNode0.Highlight();
+                    NodeHitByMouse.Highlight();
                 }
 
                 //Delete node
-                if (IsKeyPressed(Raylib.KeyboardKey.KeyDelete) && tempNode0 == tempNode1)
+                if (IsKeyPressed(Raylib.KeyboardKey.KeyDelete) && NodeHitByMouse == NodeSelected)
                 {
-                    int removeIndex = tempNode0.index;
+                    int removeIndex = NodeHitByMouse.NodeIndex;
+                    NodeList.RemoveAt(removeIndex); //remove from list
 
-                    node.RemoveAt(removeIndex); //remove from list
+                    IsSelected = false; //deselect node
+                    DeleteConnections(AdjacencyMatrix, removeIndex);//remove connections from main array
+                    AdjacencyMatrix = ResizeArray(AdjacencyMatrix, NodeList.Count);
 
-                    firstChoosen = false; //deselect node
-
-                    DeleteConnections(matrix, removeIndex);//remove connections from main array
-
-                    matrix = ResizeArray(matrix, node.Count);//resize array
-
-                    for (int i = 0; i < node.Count; i++) //redo all indexes
-                        node[i].index = i;
-
-                    tempNode0 = null;
+                    for (int i = 0; i < NodeList.Count; i++) //redo all indexes
+                        NodeList[i].NodeIndex = i;
                 }
 
-                keyboardInteraction.keyboardInteractions();
+                KeyboardInteraction.KeyboardInteractions();
                 stopwatch.Stop();
                 DrawText("TimeForFrame" + stopwatch.ElapsedMilliseconds, 10, GetScreenHeight() - 70, 20, Color.BLACK);
                 EndDrawing();
-                int kek = (1000 / targetFps - stopwatch.ElapsedMilliseconds < 0) ? 0 : 1000 / (int)(targetFps - stopwatch.ElapsedMilliseconds);
+                int kek = (1000 / TargetFPS - stopwatch.ElapsedMilliseconds < 0) ? 0 : 1000 / (int)(TargetFPS - stopwatch.ElapsedMilliseconds);
                 stopwatch.Reset();
                 Thread.Sleep(kek);
             }

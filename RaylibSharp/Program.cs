@@ -116,8 +116,11 @@ namespace RaylibSharp
                             NodeToConnect = NodeHitByMouse;
                             if (NodeToConnect != NodeSelected) //No distance to itself
                             {
-                                AdjacencyMatrix[NodeToConnect.NodeIndex, NodeSelected.NodeIndex] = 1;
-                                AdjacencyMatrix[NodeSelected.NodeIndex, NodeToConnect.NodeIndex] = 1;
+                                //value is the opposite of the current connection
+                                //when there is a connection, that connection is removed
+                                int value = (AdjacencyMatrix[NodeToConnect.NodeIndex, NodeSelected.NodeIndex] != 0) ? (0) : 1;
+                                AdjacencyMatrix[NodeToConnect.NodeIndex, NodeSelected.NodeIndex] = value;
+                                AdjacencyMatrix[NodeSelected.NodeIndex, NodeToConnect.NodeIndex] = value;
                             }
                             else //If NodeSelected is the NodeHitByMouse then change CenterNode
                             {

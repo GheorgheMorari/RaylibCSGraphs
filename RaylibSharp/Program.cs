@@ -13,6 +13,7 @@ namespace RaylibSharp
 
         //Temporary nodes
         public static NodeClass NodeHitByMouse = new NodeClass();
+
         public static NodeClass NodeSelected = new NodeClass();
         public static NodeClass NodeToConnect;
 
@@ -79,7 +80,7 @@ namespace RaylibSharp
         public static void Main()
         {
             const int TargetFPS = 60;
-            InitWindow(1800, 980, "PBL Matrix Linear Transformations");
+            InitWindow(1800, 980, "PBL Matrix Transformations");
             SetTargetFPS(TargetFPS);
 
             CenterNode = new NodeClass(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
@@ -96,7 +97,7 @@ namespace RaylibSharp
                     Vector2 MousePos = GetMousePosition();
                     foreach (NodeClass ThisNode in NodeList)
                         if (ThisNode.CheckIfHitBy(MousePos))
-                        { 
+                        {
                             Colision = true;
                             NodeHitByMouse = ThisNode;
                             break;
@@ -107,7 +108,7 @@ namespace RaylibSharp
                         if (!IsSelected) //choose the first node
                         {
                             IsSelected = true;
-                            NodeSelected = NodeHitByMouse; 
+                            NodeSelected = NodeHitByMouse;
                         }
                         else //choose the second node
                         {
@@ -147,9 +148,9 @@ namespace RaylibSharp
                 if (ShowText)
                 {
                     DrawText("Press I to import graph from file or press buttons 1 to 7", 10, GetScreenHeight() - 30, 20, Color.BLACK);
-                    DrawText("Press W to export graph", 10, GetScreenHeight() - 50, 20, Color.BLACK);
+                    DrawText("Press O to export graph, Insert - Reset", 10, GetScreenHeight() - 50, 20, Color.BLACK);
                     DrawText("Toggle: C-Connections, V-Nodes, G-text, R-resetMatrix, F-resetAngle", 10, 10, 20, Color.BLACK);
-                    
+
                     string buf = (1 - TransformationMatrix[0, 0] + (float)Math.Cos(TransformationAngle)).ToString();
                     DrawText(buf, 30, 30, 20, Color.BLACK);
                     buf = (TransformationMatrix[0, 1] - (float)Math.Sin(TransformationAngle)).ToString();
@@ -196,7 +197,7 @@ namespace RaylibSharp
 
                 KeyboardInteraction.KeyboardInteractions();
                 stopwatch.Stop();
-                DrawText("TimeForFrame" + stopwatch.ElapsedMilliseconds, 10, GetScreenHeight() - 70, 20, Color.BLACK);
+                DrawText("FPS " + (int)(1000 / (stopwatch.Elapsed.TotalMilliseconds + 0.000001)), 10, GetScreenHeight() - 70, 20, Color.BLACK);
                 EndDrawing();
                 int kek = (1000 / TargetFPS - stopwatch.ElapsedMilliseconds < 0) ? 0 : 1000 / (int)(TargetFPS - stopwatch.ElapsedMilliseconds);
                 stopwatch.Reset();

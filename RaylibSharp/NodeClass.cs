@@ -6,7 +6,7 @@ namespace RaylibSharp
 {
     public class NodeClass
     {
-        private Vector2 TemporaryPos;
+        public Vector2 TemporaryPos;
         public Vector2 OriginalPos;
         public Vector2 TransformedPos;
 

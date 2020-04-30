@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
+using System.Collections.Generic;
 using static RaylibSharp.Raylib.Raylib;
+using RaylibSharp.Raylib.Types;
 
 namespace RaylibSharp
 {
@@ -103,6 +105,15 @@ namespace RaylibSharp
                         Program.AdjacencyMatrix[j, i] = rnd;
                     }
             }
+
+            if (IsKeyPressed(Raylib.KeyboardKey.KeyInsert) && Program.edit) //randomise connections
+            {
+                Program.NodeList = new List<NodeClass>();
+                Program.AdjacencyMatrix = Program.ResizeArray(Program.AdjacencyMatrix, 1);
+                Program.CenterNode = new NodeClass(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
+                Program.CenterNode = NodeClass.MakeCenter(Program.CenterNode);
+            }
+
             if (IsKeyPressed(Raylib.KeyboardKey.KeyOne))
                 Program.AdjacencyMatrix = ReadingTxt.ReadingWriting.ImportMatrix(out Program.NodeList, "1.txt");
             if (IsKeyPressed(Raylib.KeyboardKey.KeyTwo))
@@ -117,6 +128,12 @@ namespace RaylibSharp
                 Program.AdjacencyMatrix = ReadingTxt.ReadingWriting.ImportMatrix(out Program.NodeList, "6.txt");
             if (IsKeyPressed(Raylib.KeyboardKey.KeySeven))
                 Program.AdjacencyMatrix = ReadingTxt.ReadingWriting.ImportMatrix(out Program.NodeList, "7.txt");
+            if (IsKeyPressed(Raylib.KeyboardKey.KeyEight))
+                Program.AdjacencyMatrix = ReadingTxt.ReadingWriting.ImportMatrix(out Program.NodeList, "8.txt");
+            if (IsKeyPressed(Raylib.KeyboardKey.KeyNine))
+                Program.AdjacencyMatrix = ReadingTxt.ReadingWriting.ImportMatrix(out Program.NodeList, "9.txt");
+            if (IsKeyPressed(Raylib.KeyboardKey.KeyZero))
+                Program.AdjacencyMatrix = ReadingTxt.ReadingWriting.ImportMatrix(out Program.NodeList, "0.txt");
         }
     }
 }

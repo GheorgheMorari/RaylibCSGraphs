@@ -78,8 +78,8 @@ namespace ReadingTxt
 
                 for (int i = 0; i < node.Count; i++)
                 {
-                    filePath.WriteLine(((int)node[i].OriginalPos.x).ToString());
-                    filePath.WriteLine(((int)node[i].OriginalPos.y).ToString());
+                    filePath.WriteLine(((int)node[i].OriginalPos.x + Program.CenterNode.TemporaryPos.x).ToString());
+                    filePath.WriteLine(((int)node[i].OriginalPos.y + Program.CenterNode.TemporaryPos.y).ToString());
                 }
 
                 filePath.WriteLine("Number of vertices in the graph:" + len);

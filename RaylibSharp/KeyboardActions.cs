@@ -86,7 +86,7 @@ namespace RaylibSharp
                 Program.AdjacencyMatrix = ReadingTxt.ReadingWriting.ImportMatrix(out Program.NodeList, "export.txt");
             }
             //Export the matrix by pressing W
-            if (IsKeyPressed(Raylib.KeyboardKey.KeyW))
+            if (IsKeyPressed(Raylib.KeyboardKey.KeyO))
             {
                 //Export matrix
                 ReadingTxt.ReadingWriting.ExportMatrix(Program.AdjacencyMatrix, Program.NodeList);

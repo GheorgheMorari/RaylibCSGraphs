@@ -23,7 +23,7 @@ namespace RaylibSharp
         public const float ConnectionThickness = 3F;
 
         private static bool Colision = false;
-        private static bool IsSelected = false;
+        public static bool IsSelected = false;
 
         public static bool showConnections = true;
         public static bool ShowText = true;

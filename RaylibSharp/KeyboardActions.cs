@@ -112,6 +112,7 @@ namespace RaylibSharp
                 Program.AdjacencyMatrix = Program.ResizeArray(Program.AdjacencyMatrix, 1);
                 Program.CenterNode = new NodeClass(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
                 Program.CenterNode = NodeClass.MakeCenter(Program.CenterNode);
+                Program.IsSelected = false;
             }
 
             if (IsKeyPressed(Raylib.KeyboardKey.KeyOne))

@@ -12,8 +12,8 @@ namespace RaylibSharp
 
         public int NodeIndex;
 
-        public const float NodeRadius = 10;
-        public const float NodeBorderWidth = 1;
+        public const float NodeRadius = 7;
+        public const float NodeBorderWidth = 0.5f;
 
         private Color BaseColor;
         private Color BorderColor;
@@ -37,7 +37,7 @@ namespace RaylibSharp
             OriginalPos.x = pos_.x - centerNode.TemporaryPos.x;
             OriginalPos.y = pos_.y - centerNode.TemporaryPos.y;
             TemporaryPos = OriginalPos;
-            TransformedPos = TemporaryPos;
+            TransformedPos = OriginalPos;
         }
 
         public NodeClass(Vector2 pos_, int index_)
@@ -48,21 +48,33 @@ namespace RaylibSharp
             CenterColor = new Color(24, 240, 13);
             BorderColor = new Color(130, 45, 45);
             NodeIndex = index_;
-            OriginalPos = TemporaryPos;
+            OriginalPos = pos_;
             TransformedPos = TemporaryPos;
         }
 
-        public void Transform(float[,] TMatrix, NodeClass centerNode, float angle = 0)
+        public void Transform(float[,] TMatrix, NodeClass centerNode,
+                              float angle)
         {
-            TransformedPos.x = TemporaryPos.x * (1 - TMatrix[0, 0] + (float)Math.Cos(angle)) - TemporaryPos.y * (TMatrix[0, 1] - (float)Math.Sin(angle)) + centerNode.TemporaryPos.x;
-            TransformedPos.y = -TemporaryPos.x * (TMatrix[1, 0] + (float)Math.Sin(angle)) + TemporaryPos.y * (1 - TMatrix[1, 1] + (float)Math.Cos(angle)) + centerNode.TemporaryPos.y;
-        }
+            float scaleX = TMatrix[0, 0];
+            float scaleY = TMatrix[1, 1];
 
-        public void OffsetNodeToCenter(NodeClass centerNode)
-        {
-            TemporaryPos.x = OriginalPos.x - centerNode.OriginalPos.x;
-            TemporaryPos.y = OriginalPos.y - centerNode.OriginalPos.y;
-            IsNodeCenter = false;
+            TransformedPos.x = OriginalPos.x * scaleX;
+            TransformedPos.y = OriginalPos.y * scaleY;
+
+            float skewX = TransformedPos.y * TMatrix[0, 1];
+            float skewY = TransformedPos.x * TMatrix[1, 0];
+
+            TransformedPos.x += skewX;
+            TransformedPos.y += skewY;
+
+            TemporaryPos.x = TransformedPos.x * (float)Math.Cos(angle)
+                           - TransformedPos.y * (float)Math.Sin(angle);
+
+            TemporaryPos.y = TransformedPos.x * (float)Math.Sin(angle)
+                           + TransformedPos.y * (float)Math.Cos(angle);
+
+            TransformedPos.x = TemporaryPos.x + centerNode.TemporaryPos.x;
+            TransformedPos.y = TemporaryPos.y + centerNode.TemporaryPos.y;
         }
 
         public bool CheckIfHitBy(Vector2 MousePosition)
@@ -74,7 +86,6 @@ namespace RaylibSharp
         {
             centerNode.IsNodeCenter = true;
             centerNode.TemporaryPos = new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2);
-            centerNode.TransformedPos = centerNode.TemporaryPos;
             return centerNode;
         }
 

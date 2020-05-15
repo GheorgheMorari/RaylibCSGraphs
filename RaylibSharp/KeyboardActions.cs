@@ -12,13 +12,14 @@ namespace RaylibSharp
 
         public static void Change()
         {
-            Parallel.For(0, Program.NodeList.Count, index =>
+            foreach (var thisNode in Program.NodeList)
             {
-                if (Program.NodeList[index] != Program.CenterNode)
+                if (!thisNode.IsNodeCenter)
                 {
-                    Program.NodeList[index].Transform(Program.TransformationMatrix, Program.CenterNode, Program.TransformationAngle);
+                    thisNode.Transform(Program.TransformationMatrix, Program.CenterNode
+                                , Program.TransformationAngle);
                 }
-            });
+            }
         }
 
         private static void Transformations() //Transformation changes
@@ -42,24 +43,24 @@ namespace RaylibSharp
                 Program.TransformationAngle += aincrement;
 
             if (IsKeyDown(Raylib.KeyboardKey.KeyW))
-                Program.TransformationMatrix[1, 1] -= increment;
-            if (IsKeyDown(Raylib.KeyboardKey.KeyS))
                 Program.TransformationMatrix[1, 1] += increment;
+            if (IsKeyDown(Raylib.KeyboardKey.KeyS))
+                Program.TransformationMatrix[1, 1] -= increment;
 
             if (IsKeyDown(Raylib.KeyboardKey.KeyA))
-                Program.TransformationMatrix[1, 0] -= increment;
+                Program.TransformationMatrix[0, 0] -= increment;
             if (IsKeyDown(Raylib.KeyboardKey.KeyD))
-                Program.TransformationMatrix[1, 0] += increment;
+                Program.TransformationMatrix[0, 0] += increment;
 
             if (IsKeyDown(Raylib.KeyboardKey.KeyDown))
-                Program.TransformationMatrix[0, 1] -= increment;
+                Program.TransformationMatrix[1, 0] -= increment;
             if (IsKeyDown(Raylib.KeyboardKey.KeyUp))
-                Program.TransformationMatrix[0, 1] += increment;
+                Program.TransformationMatrix[1, 0] += increment;
 
             if (IsKeyDown(Raylib.KeyboardKey.KeyLeft))
-                Program.TransformationMatrix[0, 0] -= increment;
+                Program.TransformationMatrix[0, 1] -= increment;
             if (IsKeyDown(Raylib.KeyboardKey.KeyRight))
-                Program.TransformationMatrix[0, 0] += increment;
+                Program.TransformationMatrix[0, 1] += increment;
             bool MatrixChange = (CMatrix[0, 0] != Program.TransformationMatrix[0, 0] ||
                                  CMatrix[0, 1] != Program.TransformationMatrix[0, 1] ||
                                  CMatrix[1, 0] != Program.TransformationMatrix[1, 0] ||

@@ -19,7 +19,8 @@ namespace RaylibSharp
 
         public static NodeClass CenterNode;
 
-        public static Color ConnectionColor = new Color(200, 200, 200);
+        public static Color ConnectionColor = new Color(100, 100, 100);
+        public static Color ConnectionColorWithNodes = new Color(200, 200, 200);
         public const float ConnectionThickness = 3F;
 
         private static bool Colision = false;
@@ -30,13 +31,13 @@ namespace RaylibSharp
         public static bool ShowNodes = true;
         public static bool edit = true;
 
-        //Adjacency AdjacencyMatrix
         public static int[,] AdjacencyMatrix = new int[2, 2];
 
         //Tranformations
         public static float[,] TransformationMatrix = new float[2, 2] { { 1, 0 }, { 0, 1 } };
 
         public static float TransformationAngle = 0;
+        public static bool ScaleThenRotate = true;
 
         public static int[,] ResizeArray(int[,] Array, int NewSize)
         {
@@ -55,7 +56,10 @@ namespace RaylibSharp
                 for (int j = i; j < len; j++)
                     if (AdjacencyMatrix[i, j] > 0)
                     {
-                        DrawLineEx(NodeList[i].TransformedPos, NodeList[j].TransformedPos, thickness, ConnectionColor);
+                        if (ShowNodes)
+                            DrawLineEx(NodeList[i].TransformedPos, NodeList[j].TransformedPos, thickness, ConnectionColorWithNodes);
+                        else
+                            DrawLineEx(NodeList[i].TransformedPos, NodeList[j].TransformedPos, thickness, ConnectionColor);
                     }
         }
 
@@ -129,8 +133,7 @@ namespace RaylibSharp
                                 {
                                     if (ThisNode != CenterNode)
                                     {
-                                        ThisNode.OffsetNodeToCenter(CenterNode);
-                                        ThisNode.Transform(TransformationMatrix, CenterNode, TransformationAngle);
+                                        ThisNode.IsNodeCenter = false;
                                     }
                                 }
                                 NodeToConnect = null;
@@ -144,7 +147,6 @@ namespace RaylibSharp
                         var NewNode = new NodeClass(GetMousePosition(), NodeList.Count, CenterNode);
                         NodeList.Add(NewNode); //if there is no Colision add new node to the list
                         AdjacencyMatrix = ResizeArray(AdjacencyMatrix, NodeList.Count);
-                        NewNode.Transform(TransformationMatrix, CenterNode, TransformationAngle);
                     }
                 }
 
@@ -154,22 +156,30 @@ namespace RaylibSharp
                     DrawText("Press O to export graph, Insert - Reset", 10, GetScreenHeight() - 50, 20, Color.BLACK);
                     DrawText("Toggle: C-Connections, V-Nodes, G-text, R-resetMatrix, F-resetAngle", 10, 10, 20, Color.BLACK);
 
-                    string buf = (1 - TransformationMatrix[0, 0] + (float)Math.Cos(TransformationAngle)).ToString();
-                    DrawText(buf, 30, 30, 20, Color.BLACK);
-                    buf = (TransformationMatrix[0, 1] - (float)Math.Sin(TransformationAngle)).ToString();
-                    DrawText(buf, 170, 30, 20, Color.BLACK);
-                    buf = (TransformationMatrix[1, 0] + (float)Math.Sin(TransformationAngle)).ToString();
-                    DrawText(buf, 30, 60, 20, Color.BLACK);
-                    buf = (1 - TransformationMatrix[1, 1] + (float)Math.Cos(TransformationAngle)).ToString();
-                    DrawText(buf, 170, 60, 20, Color.BLACK);
+                    string buf = (TransformationMatrix[0, 0]).ToString();
+                    DrawText("ScaleX= " + buf, 10, 35, 20, Color.BLACK);
+                    buf = (TransformationMatrix[1, 1]).ToString();
+                    DrawText("ScaleY= " + buf, 10, 60, 20, Color.BLACK);
+
+                    buf = (TransformationMatrix[0, 1]).ToString();
+                    DrawText("SkewX= " + buf, 10, 85, 20, Color.BLACK);
+                    buf = (TransformationMatrix[1, 0]).ToString();
+                    DrawText("SkewY= " + buf, 10, 110, 20, Color.BLACK);
+
+                    buf = (CenterNode.OriginalPos.x).ToString();
+                    DrawText("OffsetX= " + buf, 10, 135, 20, Color.BLACK);
+                    buf = (CenterNode.OriginalPos.y).ToString();
+                    DrawText("OffsetY= " + buf, 10, 160, 20, Color.BLACK);
 
                     buf = (TransformationAngle / (float)3.14 * 180).ToString();
-                    DrawText("Angle in Degrees:" + buf, 30, 90, 20, Color.BLACK);
+                    DrawText("Angle in Degrees:" + buf, 10, 185, 20, Color.BLACK);
                 }
 
                 //Show all the connections
                 if (showConnections)
-                    DrawConnections(AdjacencyMatrix, NodeList, ConnectionColor, ConnectionThickness);
+                    DrawConnections(AdjacencyMatrix, NodeList, ConnectionColor,
+                        ConnectionThickness * Math.Max((float)Math.Sqrt(TransformationMatrix[1, 1] *
+                        TransformationMatrix[1, 1] + TransformationMatrix[0, 0] * TransformationMatrix[0, 0]), 0.4f));
 
                 //Show all the nodes
                 if (ShowNodes)

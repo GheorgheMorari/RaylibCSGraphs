@@ -36,6 +36,12 @@ namespace RaylibSharp
             {
                 Program.TransformationAngle = 0;
             }
+            if (IsKeyPressed(Raylib.KeyboardKey.KeyT)) //reset offset
+            {
+                Program.CenterNode = new NodeClass(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
+                Program.CenterNode.TransformedPos.x = Program.CenterNode.OriginalPos.x - Program.CenterNode.TemporaryPos.x;
+                Program.CenterNode.TransformedPos.y = Program.CenterNode.OriginalPos.y - Program.CenterNode.TemporaryPos.y;
+            }
 
             if (IsKeyDown(Raylib.KeyboardKey.KeyQ)) //decrease angle
                 Program.TransformationAngle -= aincrement;
@@ -112,7 +118,8 @@ namespace RaylibSharp
                 Program.NodeList = new List<NodeClass>();
                 Program.AdjacencyMatrix = Program.ResizeArray(Program.AdjacencyMatrix, 1);
                 Program.CenterNode = new NodeClass(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
-                Program.CenterNode = NodeClass.MakeCenter(Program.CenterNode);
+                Program.CenterNode.TransformedPos.x = Program.CenterNode.OriginalPos.x - Program.CenterNode.TemporaryPos.x;
+                Program.CenterNode.TransformedPos.y = Program.CenterNode.OriginalPos.y - Program.CenterNode.TemporaryPos.y;
                 Program.IsSelected = false;
             }
 

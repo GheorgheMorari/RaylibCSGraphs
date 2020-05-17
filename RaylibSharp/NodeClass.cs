@@ -27,7 +27,7 @@ namespace RaylibSharp
         {
         }
 
-        public NodeClass(Vector2 pos_, int index_, NodeClass centerNode)
+        public NodeClass(Vector2 pos_, int index_, NodeClass centerNode) //create node
         {
             BaseColor = new Color(255, 0, 0);
             HighlightColor = new Color(255, 215, 0);
@@ -40,7 +40,7 @@ namespace RaylibSharp
             TransformedPos = OriginalPos;
         }
 
-        public NodeClass(Vector2 pos_, int index_)
+        public NodeClass(Vector2 pos_, int index_) //create center
         {
             TemporaryPos = pos_;
             BaseColor = new Color(255, 0, 0);
@@ -50,6 +50,9 @@ namespace RaylibSharp
             NodeIndex = index_;
             OriginalPos = pos_;
             TransformedPos = TemporaryPos;
+            TransformedPos.x = OriginalPos.x - TemporaryPos.x;
+            TransformedPos.y = OriginalPos.y - TemporaryPos.y;
+            IsNodeCenter = true;
         }
 
         public void Transform(float[,] TMatrix, NodeClass centerNode,
@@ -58,8 +61,8 @@ namespace RaylibSharp
             float scaleX = TMatrix[0, 0];
             float scaleY = TMatrix[1, 1];
 
-            TransformedPos.x = OriginalPos.x * scaleX;
-            TransformedPos.y = OriginalPos.y * scaleY;
+            TransformedPos.x = (OriginalPos.x + centerNode.TransformedPos.x) * scaleX;
+            TransformedPos.y = (OriginalPos.y + centerNode.TransformedPos.y) * scaleY;
 
             float skewX = TransformedPos.y * TMatrix[0, 1];
             float skewY = TransformedPos.x * TMatrix[1, 0];
@@ -82,26 +85,23 @@ namespace RaylibSharp
             return CheckCollisionPointCircle(MousePosition, TransformedPos, NodeRadius);
         }
 
-        public static NodeClass MakeCenter(NodeClass centerNode)
-        {
-            centerNode.IsNodeCenter = true;
-            centerNode.TemporaryPos = new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2);
-            return centerNode;
-        }
-
         public void DisplayNode()
         {
-            DrawCircleV(TransformedPos, NodeRadius + NodeBorderWidth, BorderColor); //draw border
-            if (IsNodeHighlited)
+            if (IsNodeCenter)
             {
-                DrawCircleV(TransformedPos, NodeRadius, HighlightColor); //draw highlight
-                IsNodeHighlited = false;
+                DrawCircleV(TemporaryPos, NodeRadius - 4, CenterColor); //draw center
             }
             else
-                if (IsNodeCenter)
-                DrawCircleV(TransformedPos, NodeRadius, CenterColor); //draw center
-            else
-                DrawCircleV(TransformedPos, NodeRadius, BaseColor); //draw circle
+            {
+                DrawCircleV(TransformedPos, NodeRadius + NodeBorderWidth, BorderColor); //draw border
+                if (IsNodeHighlited)
+                {
+                    DrawCircleV(TransformedPos, NodeRadius, HighlightColor); //draw highlight
+                    IsNodeHighlited = false;
+                }
+                else
+                    DrawCircleV(TransformedPos, NodeRadius, BaseColor); //draw circle
+            }
         }
 
         public void Highlight() //method that draws the circle in the main color and the border around it

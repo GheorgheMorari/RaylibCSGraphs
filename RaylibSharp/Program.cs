@@ -88,7 +88,8 @@ namespace RaylibSharp
             SetTargetFPS(TargetFPS);
 
             CenterNode = new NodeClass(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
-            CenterNode = NodeClass.MakeCenter(CenterNode);
+            CenterNode.TransformedPos.x = CenterNode.OriginalPos.x - CenterNode.TemporaryPos.x;
+            CenterNode.TransformedPos.y = CenterNode.OriginalPos.y - CenterNode.TemporaryPos.y;
 
             Stopwatch stopwatch = new Stopwatch();
             while (!WindowShouldClose())
@@ -128,14 +129,10 @@ namespace RaylibSharp
                             }
                             else //If NodeSelected is the NodeHitByMouse then change CenterNode
                             {
-                                CenterNode = NodeClass.MakeCenter(NodeSelected);
-                                foreach (NodeClass ThisNode in NodeList)
-                                {
-                                    if (ThisNode != CenterNode)
-                                    {
-                                        ThisNode.IsNodeCenter = false;
-                                    }
-                                }
+                                CenterNode.TemporaryPos = NodeHitByMouse.TransformedPos;
+                                CenterNode.TransformedPos.x = CenterNode.OriginalPos.x - CenterNode.TemporaryPos.x;
+                                CenterNode.TransformedPos.y = CenterNode.OriginalPos.y - CenterNode.TemporaryPos.y;
+                                KeyboardInteraction.Change();
                                 NodeToConnect = null;
                                 NodeHitByMouse = null;
                             }
@@ -147,6 +144,7 @@ namespace RaylibSharp
                         var NewNode = new NodeClass(GetMousePosition(), NodeList.Count, CenterNode);
                         NodeList.Add(NewNode); //if there is no Colision add new node to the list
                         AdjacencyMatrix = ResizeArray(AdjacencyMatrix, NodeList.Count);
+                        KeyboardInteraction.Change();
                     }
                 }
 
@@ -166,9 +164,9 @@ namespace RaylibSharp
                     buf = (TransformationMatrix[1, 0]).ToString();
                     DrawText("SkewY= " + buf, 10, 110, 20, Color.BLACK);
 
-                    buf = (CenterNode.OriginalPos.x).ToString();
+                    buf = (CenterNode.OriginalPos.x - CenterNode.TransformedPos.x).ToString();
                     DrawText("OffsetX= " + buf, 10, 135, 20, Color.BLACK);
-                    buf = (CenterNode.OriginalPos.y).ToString();
+                    buf = (CenterNode.OriginalPos.x - CenterNode.TransformedPos.y).ToString();
                     DrawText("OffsetY= " + buf, 10, 160, 20, Color.BLACK);
 
                     buf = (TransformationAngle / (float)3.14 * 180).ToString();
@@ -183,15 +181,17 @@ namespace RaylibSharp
 
                 //Show all the nodes
                 if (ShowNodes)
+                {
                     foreach (NodeClass ThisNode in NodeList)
                     {
                         ThisNode.DisplayNode();
                     }
-
+                    CenterNode.DisplayNode();
+                }
                 //Highlight selected node
-                if (NodeHitByMouse == NodeSelected)
+                if (IsSelected)
                 {
-                    NodeHitByMouse.Highlight();
+                    NodeSelected.Highlight();
                 }
 
                 //Delete node
@@ -210,9 +210,11 @@ namespace RaylibSharp
 
                 KeyboardInteraction.KeyboardInteractions();
                 stopwatch.Stop();
-                DrawText("FPS " + (int)(1000 / (stopwatch.Elapsed.TotalMilliseconds + 0.000001)), 10, GetScreenHeight() - 70, 20, Color.BLACK);
                 EndDrawing();
-                int kek = (1000 / TargetFPS - stopwatch.ElapsedMilliseconds < 0) ? 0 : 1000 / (int)(TargetFPS - stopwatch.ElapsedMilliseconds);
+                int kek = (1000 / TargetFPS - stopwatch.Elapsed.TotalMilliseconds < 0) ? 0 :
+                    (int)(1000 / TargetFPS - stopwatch.Elapsed.TotalMilliseconds);
+                if (ShowText)
+                    DrawText("FPS " + GetFPS(), 10, GetScreenHeight() - 70, 20, Color.BLACK);
                 stopwatch.Reset();
                 Thread.Sleep(kek);
             }

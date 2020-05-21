@@ -1,7 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using RaylibSharp.Raylib.Types;
 using System.Collections.Generic;
 using static RaylibSharp.Raylib.Raylib;
-using RaylibSharp.Raylib.Types;
 
 namespace RaylibSharp
 {
@@ -10,24 +9,22 @@ namespace RaylibSharp
         private const float increment = (float)0.1;
         private const float aincrement = (float)3.14 / 180;
 
-        public static void Change()
+        private static float[,] CMatrix = { { Program.TransformationMatrix[0, 0], Program.TransformationMatrix[0, 1] },
+                                 { Program.TransformationMatrix[1, 0], Program.TransformationMatrix[1, 1] } };
+
+        private static float C_angle = Program.TransformationAngle;
+
+        public static void Change()//Recalculate the coordinates according to the changed matrix
         {
             foreach (var thisNode in Program.NodeList)
             {
-                if (!thisNode.IsNodeCenter)
-                {
-                    thisNode.Transform(Program.TransformationMatrix, Program.CenterNode
-                                , Program.TransformationAngle);
-                }
+                thisNode.TransformCoordinates(Program.TransformationMatrix, Program.CenterNode
+                            , Program.TransformationAngle);
             }
         }
 
-        private static void Transformations() //Transformation changes
+        private static void Transformations() //Key presses that change transformation
         {
-            float C_angle = Program.TransformationAngle;
-            float[,] CMatrix = { { Program.TransformationMatrix[0, 0], Program.TransformationMatrix[0, 1] },
-                                 { Program.TransformationMatrix[1, 0], Program.TransformationMatrix[1, 1] } }; ;
-
             if (IsKeyPressed(Raylib.KeyboardKey.KeyR)) //reset TMatrix
             {
                 Program.TransformationMatrix = new float[2, 2] { { 1, 0 }, { 0, 1 } };
@@ -67,12 +64,21 @@ namespace RaylibSharp
                 Program.TransformationMatrix[0, 1] -= increment;
             if (IsKeyDown(Raylib.KeyboardKey.KeyRight))
                 Program.TransformationMatrix[0, 1] += increment;
+
+            //Verify if matrix or angle has changed, if yes then recalculate
             bool MatrixChange = (CMatrix[0, 0] != Program.TransformationMatrix[0, 0] ||
                                  CMatrix[0, 1] != Program.TransformationMatrix[0, 1] ||
                                  CMatrix[1, 0] != Program.TransformationMatrix[1, 0] ||
                                  CMatrix[1, 1] != Program.TransformationMatrix[1, 1]);
             if (C_angle != Program.TransformationAngle || MatrixChange)
+            {
                 Change();
+                CMatrix[0, 0] = Program.TransformationMatrix[0, 0];
+                CMatrix[0, 1] = Program.TransformationMatrix[0, 1];
+                CMatrix[1, 0] = Program.TransformationMatrix[1, 0];
+                CMatrix[1, 1] = Program.TransformationMatrix[1, 1];
+                C_angle = Program.TransformationAngle;
+            }
         }
 
         public static void KeyboardInteractions()
@@ -87,6 +93,7 @@ namespace RaylibSharp
             if (IsKeyPressed(Raylib.KeyboardKey.KeyG))//toggle text
                 Program.ShowText = !Program.ShowText;
 
+            //Transformation related keyboard interactions
             Transformations();
 
             //Import the matrix by pressing I
@@ -94,10 +101,9 @@ namespace RaylibSharp
             {
                 Program.AdjacencyMatrix = ReadingTxt.ReadingWriting.ImportMatrix(out Program.NodeList, "export.txt");
             }
-            //Export the matrix by pressing W
+            //Export the matrix by pressing O
             if (IsKeyPressed(Raylib.KeyboardKey.KeyO))
             {
-                //Export matrix
                 ReadingTxt.ReadingWriting.ExportMatrix(Program.AdjacencyMatrix, Program.NodeList);
             }
 
@@ -122,7 +128,7 @@ namespace RaylibSharp
                 Program.CenterNode.TransformedPos.y = Program.CenterNode.OriginalPos.y - Program.CenterNode.TemporaryPos.y;
                 Program.IsSelected = false;
             }
-
+            //Key presses that load the respective images from files
             if (IsKeyPressed(Raylib.KeyboardKey.KeyOne))
                 Program.AdjacencyMatrix = ReadingTxt.ReadingWriting.ImportMatrix(out Program.NodeList, "1.txt");
             if (IsKeyPressed(Raylib.KeyboardKey.KeyTwo))

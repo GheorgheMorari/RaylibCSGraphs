@@ -2,6 +2,11 @@
 using System;
 using static RaylibSharp.Raylib.Raylib;
 
+//This is the NodeClass file, where all operations
+//that involve nodes are made.
+//The nodes in this program are the the points where a segment end.
+//
+
 namespace RaylibSharp
 {
     public class NodeClass
@@ -10,8 +15,6 @@ namespace RaylibSharp
         public Vector2 OriginalPos;
         public Vector2 TransformedPos;
 
-        public int NodeIndex;
-
         public const float NodeRadius = 7;
         public const float NodeBorderWidth = 0.5f;
 
@@ -19,6 +22,8 @@ namespace RaylibSharp
         private Color BorderColor;
         private Color HighlightColor;
         private Color CenterColor;
+
+        public int NodeIndex;
 
         private bool IsNodeHighlited = false;
         public bool IsNodeCenter = false;
@@ -55,32 +60,36 @@ namespace RaylibSharp
             IsNodeCenter = true;
         }
 
-        public void Transform(float[,] TMatrix, NodeClass centerNode,
+        public void TransformCoordinates(float[,] TMatrix, NodeClass centerNode,
                               float angle)
         {
+            //Scaling
             float scaleX = TMatrix[0, 0];
             float scaleY = TMatrix[1, 1];
 
             TransformedPos.x = (OriginalPos.x + centerNode.TransformedPos.x) * scaleX;
             TransformedPos.y = (OriginalPos.y + centerNode.TransformedPos.y) * scaleY;
 
+            //Skewing
             float skewX = TransformedPos.y * TMatrix[0, 1];
             float skewY = TransformedPos.x * TMatrix[1, 0];
 
             TransformedPos.x += skewX;
             TransformedPos.y += skewY;
 
+            //Rotation
             TemporaryPos.x = TransformedPos.x * (float)Math.Cos(angle)
                            - TransformedPos.y * (float)Math.Sin(angle);
 
             TemporaryPos.y = TransformedPos.x * (float)Math.Sin(angle)
                            + TransformedPos.y * (float)Math.Cos(angle);
 
+            //Final coordinates
             TransformedPos.x = TemporaryPos.x + centerNode.TemporaryPos.x;
             TransformedPos.y = TemporaryPos.y + centerNode.TemporaryPos.y;
         }
 
-        public bool CheckIfHitBy(Vector2 MousePosition)
+        public bool CheckIfHitBy(Vector2 MousePosition) //check if point is within circle
         {
             return CheckCollisionPointCircle(MousePosition, TransformedPos, NodeRadius);
         }

@@ -8,7 +8,6 @@ namespace ReadingTxt
 {
     public static class ReadingWriting
     {
-        //importing matrix
         public static int[,] ImportMatrix(out List<NodeClass> node, string filename = "import.txt")
         {
             node = new List<NodeClass>();
@@ -34,7 +33,7 @@ namespace ReadingTxt
             }
 
             n = Int32.Parse(file.ReadLine());
-            for (int k = 0; k < n; k++)
+            for (int k = 0; k < n; k++) //input all node coordinates
             {
                 Vector2 coords = new Vector2();
                 coords.x = Int32.Parse(file.ReadLine());
@@ -45,18 +44,18 @@ namespace ReadingTxt
             file.Close();
             matrix = Program.ResizeArray(matrix, n);
             Program.IsSelected = false;
-            KeyboardInteraction.Change();
+            KeyboardInteraction.Change(); //recalculate the coordinates
             return matrix;
         }
 
-        public static void ExportMatrix(int[,] matrix, List<NodeClass> node, string filename = "export.txt") //exporting matrix
+        public static void ExportMatrix(int[,] matrix, List<NodeClass> node, string filename = "export.txt")
         {
             int len = matrix.GetLength(0);
             int count = 0;
             using (TextWriter filePath = new StreamWriter(@"../../" + filename))//location of the file
             {
                 filePath.WriteLine(len);
-                for (int i = 0; i < len; i++)
+                for (int i = 0; i < len; i++) //export adjacency matrix to file
                 {
                     for (int j = 0; j < len; j++)
                     {
@@ -77,12 +76,12 @@ namespace ReadingTxt
                 }
                 filePath.WriteLine(node.Count.ToString());
 
-                for (int i = 0; i < node.Count; i++)
+                for (int i = 0; i < node.Count; i++) //export all node coordinates to file
                 {
                     filePath.WriteLine(((int)node[i].OriginalPos.x + Program.CenterNode.TemporaryPos.x).ToString());
                     filePath.WriteLine(((int)node[i].OriginalPos.y + Program.CenterNode.TemporaryPos.y).ToString());
                 }
-
+                //Informational texts
                 filePath.WriteLine("Number of vertices in the graph:" + len);
                 filePath.WriteLine("Number of edges in the graph:" + (count / 2));
             }

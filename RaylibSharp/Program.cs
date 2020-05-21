@@ -5,6 +5,14 @@ using System.Diagnostics;
 using System.Threading;
 using static RaylibSharp.Raylib.Raylib;
 
+//This is an Practical implementation of linear transformations
+//Made for the PBL Project that our team has choosen
+//The team members are: Morari Gheorghe, Malii Antonela, Botezat Roman, Cerlat Pavel
+
+//This is the main program file
+//Here is the backbone of the program that
+//provides communication between files and classes
+//and is responsible for all the drawing on screen
 namespace RaylibSharp
 {
     public static class Program
@@ -87,20 +95,21 @@ namespace RaylibSharp
             InitWindow(1800, 980, "PBL Matrix Transformations");
             SetTargetFPS(TargetFPS);
 
+            //Set the center of transformations to the middle of the screen
             CenterNode = new NodeClass(new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2), 0);
             CenterNode.TransformedPos.x = CenterNode.OriginalPos.x - CenterNode.TemporaryPos.x;
             CenterNode.TransformedPos.y = CenterNode.OriginalPos.y - CenterNode.TemporaryPos.y;
 
             Stopwatch stopwatch = new Stopwatch();
-            while (!WindowShouldClose())
+            while (!WindowShouldClose()) //The main loop
             {
                 stopwatch.Start();
                 BeginDrawing();
                 ClearBackground(Color.WHITE);
-                if (IsMouseButtonPressed(0)) //Click to add new node
+                if (IsMouseButtonPressed(0)) //Trigger at mouse press
                 {
                     Vector2 MousePos = GetMousePosition();
-                    foreach (NodeClass ThisNode in NodeList)
+                    foreach (NodeClass ThisNode in NodeList) //find which node was clicked on
                         if (ThisNode.CheckIfHitBy(MousePos))
                         {
                             Colision = true;
@@ -110,16 +119,16 @@ namespace RaylibSharp
 
                     if (Colision)
                     {
-                        if (!IsSelected) //choose the first node
+                        if (!IsSelected) //select the first node
                         {
                             IsSelected = true;
                             NodeSelected = NodeHitByMouse;
                         }
-                        else //choose the second node
+                        else //select the second node
                         {
                             IsSelected = false;
                             NodeToConnect = NodeHitByMouse;
-                            if (NodeToConnect != NodeSelected) //No distance to itself
+                            if (NodeToConnect != NodeSelected) //No connection to itself
                             {
                                 //value is the opposite of the current connection
                                 //when there is a connection, that connection is removed
@@ -128,7 +137,7 @@ namespace RaylibSharp
                                 AdjacencyMatrix[NodeSelected.NodeIndex, NodeToConnect.NodeIndex] = value;
                             }
                             else //If NodeSelected is the NodeHitByMouse then change CenterNode
-                            {
+                            {   //Double clicking basically
                                 CenterNode.TemporaryPos = NodeHitByMouse.TransformedPos;
                                 CenterNode.TransformedPos.x = CenterNode.OriginalPos.x - CenterNode.TemporaryPos.x;
                                 CenterNode.TransformedPos.y = CenterNode.OriginalPos.y - CenterNode.TemporaryPos.y;
@@ -139,9 +148,9 @@ namespace RaylibSharp
                         }
                         Colision = false;
                     }
-                    else //Add new node
+                    else //If there was no colision, add new node
                     {
-                        var NewNode = new NodeClass(GetMousePosition(), NodeList.Count, CenterNode);
+                        var NewNode = new NodeClass(MousePos, NodeList.Count, CenterNode);
                         NodeList.Add(NewNode); //if there is no Colision add new node to the list
                         AdjacencyMatrix = ResizeArray(AdjacencyMatrix, NodeList.Count);
                         KeyboardInteraction.Change();
@@ -208,15 +217,17 @@ namespace RaylibSharp
                         NodeList[i].NodeIndex = i;
                 }
 
-                KeyboardInteraction.KeyboardInteractions();
-                stopwatch.Stop();
+                KeyboardInteraction.KeyboardInteractions(); //Look for keyboard inputs
                 EndDrawing();
+                stopwatch.Stop();
+                //Calculate the time needed for sleep to target TargetFPS frames per second
                 int kek = (1000 / TargetFPS - stopwatch.Elapsed.TotalMilliseconds < 0) ? 0 :
                     (int)(1000 / TargetFPS - stopwatch.Elapsed.TotalMilliseconds);
                 if (ShowText)
                     DrawText("FPS " + GetFPS(), 10, GetScreenHeight() - 70, 20, Color.BLACK);
                 stopwatch.Reset();
-                Thread.Sleep(kek);
+                //Pause the thread, so that the program doesn't use all cpu resources
+                Thread.Sleep(15);
             }
 
             CloseWindow();
